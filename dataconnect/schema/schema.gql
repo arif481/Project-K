@@ -1,0 +1,41 @@
+type User @table {
+  displayName: String!
+  email: String!
+  createdAt: Timestamp!
+  photoUrl: String
+  lastLoginAt: Timestamp
+}
+
+type Habit @table {
+  user: User!
+  name: String!
+  frequencyType: String! # Enum: "DAILY", "WEEKLY", "CUSTOM"
+  createdAt: Timestamp!
+  description: String
+  targetValue: Int
+  unit: String
+  archivedAt: Timestamp
+}
+
+type HabitFrequency @table {
+  habit: Habit!
+  dayOfWeek: String! # Enum: "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"
+}
+
+type HabitLog @table {
+  user: User!
+  habit: Habit!
+  logDate: Date!
+  isCompleted: Boolean!
+  createdAt: Timestamp!
+  value: Int
+}
+
+type Reminder @table {
+  user: User!
+  habit: Habit!
+  time: String! # Representing Time, e.g., "HH:MM"
+  isEnabled: Boolean!
+  createdAt: Timestamp!
+  daysOfWeek: [String] # List of Enum: "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"
+}

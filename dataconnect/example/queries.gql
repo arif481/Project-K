@@ -1,0 +1,68 @@
+mutation CreateHabit(
+  $name: String!
+  $description: String
+  $frequencyType: String!
+  $targetValue: Int
+  $unit: String
+) @auth(level: USER) {
+  habit_insert(
+    data: {
+      name: $name
+      description: $description
+      frequencyType: $frequencyType
+      targetValue: $targetValue
+      unit: $unit
+      userId_expr: "auth.uid"
+    }
+  ) {
+    id
+  }
+}
+
+query GetHabits @auth(level: USER) {
+  habits(where: { userId: { eq_expr: "auth.uid" } }) {
+    id
+    name
+    description
+    frequencyType
+    targetValue
+    unit
+  }
+}
+
+mutation LogHabitCompletion(
+  $habitId: UUID!
+  $isCompleted: Boolean!
+  $logDate: Date!
+  $value: Int
+) @auth(level: USER) {
+  habitLog_insert(
+    data: {
+      habitId: $habitId
+      isCompleted: $isCompleted
+      logDate: $logDate
+      value: $value
+      userId_expr: "auth.uid"
+    }
+  ) {
+    id
+  }
+}
+
+mutation UpdateReminder(
+  $id: UUID!
+  $daysOfWeek: [String!]
+  $isEnabled: Boolean!
+  $time: String!
+) @auth(level: USER) {
+  reminder_update(
+    id: $id, 
+    data: { 
+      daysOfWeek: $daysOfWeek, 
+      isEnabled: $isEnabled, 
+      time: $time 
+    }
+  ) {
+    id
+  }
+}

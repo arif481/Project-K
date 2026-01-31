@@ -1,0 +1,211 @@
+/* ==========================================
+   NEO-FUTURISTIC HUD COMPONENT LIBRARY
+   Design System: Void & Neon
+   ========================================== */
+
+/* ------------------------------------------
+   HUD CARD
+   ------------------------------------------ */
+.hud-card {
+    position: relative;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-bright);
+    padding: 24px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Corner Cuts using pseudo-elements */
+.hud-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    border-top: 2px solid var(--neon-cyan);
+    border-left: 2px solid var(--neon-cyan);
+    z-index: 10;
+}
+
+.hud-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    border-bottom: 2px solid var(--neon-cyan);
+    border-right: 2px solid var(--neon-cyan);
+    z-index: 10;
+}
+
+.hud-card:hover {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+}
+
+.hud-card__title {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: var(--neon-cyan);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hud-card__title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--neon-cyan), transparent);
+    opacity: 0.3;
+}
+
+/* ------------------------------------------
+   HUD BUTTONS
+   ------------------------------------------ */
+.hud-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 24px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--neon-cyan);
+    background: transparent;
+    border: 1px solid var(--neon-cyan);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.hud-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--neon-cyan);
+    transition: all 0.3s ease;
+    z-index: -1;
+    opacity: 0.1;
+}
+
+.hud-btn:hover {
+    color: #000;
+    background: var(--neon-cyan);
+    box-shadow: 0 0 20px var(--neon-cyan);
+}
+
+.hud-btn-primary {
+    background: var(--neon-cyan);
+    color: #000;
+}
+
+.hud-btn-primary:hover {
+    background: #fff;
+    color: #000;
+    box-shadow: 0 0 30px var(--neon-cyan);
+}
+
+.hud-btn-danger {
+    color: var(--neon-magenta);
+    border-color: var(--neon-magenta);
+}
+
+.hud-btn-danger:hover {
+    background: var(--neon-magenta);
+    color: #fff;
+    box-shadow: 0 0 20px var(--neon-magenta);
+}
+
+/* ------------------------------------------
+   LIVE TICKER
+   ------------------------------------------ */
+.live-ticker {
+    font-family: var(--font-mono);
+    display: flex;
+    flex-direction: column;
+}
+
+.live-ticker__label {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 2px;
+}
+
+.live-ticker__value {
+    font-size: 1.5rem;
+    color: #fff;
+    font-weight: 700;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+/* ------------------------------------------
+   UTILITIES
+   ------------------------------------------ */
+.text-neon-cyan {
+    color: var(--neon-cyan);
+    text-shadow: 0 0 5px var(--neon-cyan);
+}
+
+.text-neon-magenta {
+    color: var(--neon-magenta);
+    text-shadow: 0 0 5px var(--neon-magenta);
+}
+
+.text-neon-green {
+    color: var(--neon-green);
+    text-shadow: 0 0 5px var(--neon-green);
+}
+
+.bg-panel {
+    background: var(--bg-panel);
+}
+
+.border-tech {
+    border: 1px solid var(--border-bright);
+}
+
+/* Glitch Effect Utility */
+@keyframes glitch-skew {
+    0% {
+        transform: skew(0deg);
+    }
+
+    20% {
+        transform: skew(-2deg);
+    }
+
+    40% {
+        transform: skew(2deg);
+    }
+
+    60% {
+        transform: skew(-1deg);
+    }
+
+    80% {
+        transform: skew(1deg);
+    }
+
+    100% {
+        transform: skew(0deg);
+    }
+}
+
+.glitch-hover:hover {
+    animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+    color: var(--neon-magenta);
+}

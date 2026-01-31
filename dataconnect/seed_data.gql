@@ -1,0 +1,52 @@
+mutation CreateDemoData @transaction @auth(level: USER, insecureReason: "This mutation is for demo purposes and should not be used in production without proper authorization.") {
+  user_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      displayName: "demouser1",
+      email: "demouser1@example.com",
+      createdAt: "2024-04-26T12:00:00Z"
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440001",
+      displayName: "demouser2",
+      email: "demouser2@example.com",
+      createdAt: "2024-04-26T13:00:00Z"
+    }
+  ])
+  habit_insertMany(data: [
+    {
+      id: "650e8400-e29b-41d4-a716-446655440002",
+      userId: "550e8400-e29b-41d4-a716-446655440000",
+      name: "Drink Water",
+      description: "Drink 8 glasses of water a day",
+      frequencyType: "daily",
+      createdAt: "2024-04-26T12:00:00Z"
+    },
+    {
+      id: "750e8400-e29b-41d4-a716-446655440003",
+      userId: "550e8400-e29b-41d4-a716-446655440001",
+      name: "Exercise",
+      description: "30 minutes of exercise a day",
+      frequencyType: "daily",
+      createdAt: "2024-04-26T13:00:00Z"
+    }
+  ])
+  habitLog_insertMany(data: [
+    {
+      id: "850e8400-e29b-41d4-a716-446655440004",
+      habitId: "650e8400-e29b-41d4-a716-446655440002",
+      userId: "550e8400-e29b-41d4-a716-446655440000",
+      logDate: "2024-04-26",
+      isCompleted: true,
+      createdAt: "2024-04-26T12:00:00Z"
+    },
+    {
+      id: "950e8400-e29b-41d4-a716-446655440005",
+      habitId: "750e8400-e29b-41d4-a716-446655440003",
+      userId: "550e8400-e29b-41d4-a716-446655440001",
+      logDate: "2024-04-26",
+      isCompleted: false,
+      createdAt: "2024-04-26T13:00:00Z"
+    }
+  ])
+}
