@@ -180,7 +180,7 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
                     <div className="bg-[var(--bg-grid)] p-3 rounded">
                         <div className="text-[10px] text-[var(--text-secondary)] mb-1">RECOVERY</div>
                         <div className="text-lg font-mono font-bold text-white">
-                            {Math.round(substanceProgress?.overallProgress || 0)}%
+                            {Math.round(substanceProgress?.progress || 0)}%
                         </div>
                     </div>
 
@@ -197,14 +197,14 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
                 <div className="mb-4">
                     <div className="flex justify-between text-[10px] text-[var(--text-secondary)] mb-1">
                         <span>SYSTEM RECOVERY</span>
-                        <span>{Math.round(substanceProgress?.overallProgress || 0)}%</span>
+                        <span>{Math.round(substanceProgress?.progress || 0)}%</span>
                     </div>
                     <div className="w-full h-2 bg-[var(--bg-grid)] rounded-full overflow-hidden">
                         <motion.div
                             className="h-full rounded-full"
                             style={{ backgroundColor: config.color }}
                             initial={{ width: 0 }}
-                            animate={{ width: `${substanceProgress?.overallProgress || 0}%` }}
+                            animate={{ width: `${substanceProgress?.progress || 0}%` }}
                             transition={{ duration: 1, ease: 'easeOut' }}
                         />
                     </div>

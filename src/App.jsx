@@ -4,6 +4,7 @@ import Dashboard from './components/Dashboard';
 import HistoryView from './components/HistoryView';
 import EntryForm from './components/EntryForm';
 import AuthTerminal from './components/AuthTerminal';
+import AnalyticsConsole from './components/AnalyticsConsole';
 import { useState } from 'react';
 
 export default function App() {
@@ -31,6 +32,15 @@ export default function App() {
     switch (currentView) {
       case 'dashboard': return <Dashboard />;
       case 'history': return <HistoryView />;
+      case 'stats': return (
+        <div className="dashboard p-4">
+          <div className="dashboard__header mb-6">
+            <h1 className="text-2xl font-mono text-white tracking-widest border-l-4 border-[var(--neon-cyan)] pl-4">ANALYTICS CONSOLE</h1>
+            <p className="dashboard__subtitle text-[var(--text-secondary)] text-sm mt-2">Deep dive into your recovery metrics</p>
+          </div>
+          <AnalyticsConsole />
+        </div>
+      );
       case 'entry': return (
         <div className="dashboard">
           <div className="dashboard__header">

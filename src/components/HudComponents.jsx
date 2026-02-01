@@ -23,13 +23,15 @@ export function HudCard({ children, title, className = "", animate = true }) {
     );
 }
 
-export function HudButton({ children, onClick, variant = 'primary', className = "" }) {
+export function HudButton({ children, onClick, variant = 'primary', className = "", type = "button", disabled = false }) {
     return (
         <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={!disabled ? { scale: 1.05 } : {}}
+            whileTap={!disabled ? { scale: 0.95 } : {}}
             onClick={onClick}
-            className={`hud-btn hud-btn--${variant} ${className}`}
+            type={type}
+            disabled={disabled}
+            className={`hud-btn hud-btn--${variant} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
         >
             {children}
         </motion.button>

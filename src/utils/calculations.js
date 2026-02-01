@@ -72,8 +72,9 @@ export function calculateRecoveryProgress(quitDate, substance, relapseEntries = 
 /**
  * Get effective quit date accounting for relapses
  * Uses a weighted system where relapses push back progress
+ * @export
  */
-function getEffectiveQuitDate(originalQuitDate, relapseEntries, substance) {
+export function getEffectiveQuitDate(originalQuitDate, relapseEntries, substance) {
     if (!relapseEntries || relapseEntries.length === 0) {
         return new Date(originalQuitDate);
     }

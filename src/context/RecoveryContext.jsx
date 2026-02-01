@@ -131,8 +131,19 @@ export function RecoveryProvider({ children }) {
     }, [quitDates, entries]);
 
     const advancedStats = useMemo(() => {
-        return getAdvancedAnalytics(quitDates, entries, userSettings.costs);
-    }, [quitDates, entries, userSettings]);
+        const stats = getAdvancedAnalytics(quitDates, entries, userSettings.costs);
+        
+        // Calculate operative rank based on combined progress
+        const totalDays = Object.values(progress).reduce((acc, p) => acc + (p?.streak?.days || 0), 0);
+        let currentRank = 'INITIATE';
+        if (totalDays >= 365) currentRank = 'LEGENDARY';
+        else if (totalDays >= 180) currentRank = 'MASTER';
+        else if (totalDays >= 90) currentRank = 'VETERAN';
+        else if (totalDays >= 30) currentRank = 'ADEPT';
+        else if (totalDays >= 7) currentRank = 'NOVICE';
+        
+        return { ...stats, currentRank };
+    }, [quitDates, entries, userSettings, progress]);
 
     // --- Actions (Write to Firestore) ---
 
@@ -166,10 +177,33 @@ export function RecoveryProvider({ children }) {
         await deleteDoc(doc(db, `users/${user.uid}/entries`, id));
     }, [user]);
 
+    // Sign out function
+    const logout = useCallback(async () => {
+        try {
+            await auth.signOut();
+        } catch (e) {
+            console.error("Logout Error:", e);
+        }
+    }, []);
+
     // Helper Wrappers
     const startQuit = useCallback((substance, date = new Date().toISOString()) => {
         addEntry({ type: 'quit', substance, date, notes: `Protocol Initiated: ${substance}` });
     }, [addEntry]);
+
+    // Reset a specific protocol
+    const resetProtocol = useCallback(async (substance) => {
+        if (!user) return;
+        try {
+            const newQuitDates = { ...quitDates };
+            delete newQuitDates[substance];
+            await setDoc(doc(db, 'users', user.uid), {
+                quitDates: newQuitDates
+            }, { merge: true });
+        } catch (e) {
+            console.error("Reset Error:", e);
+        }
+    }, [user, quitDates]);
 
     const value = {
         user, // Expose auth state
@@ -186,7 +220,9 @@ export function RecoveryProvider({ children }) {
         addEntry,
         removeEntry,
         startQuit,
-        updateUserSettings
+        updateUserSettings,
+        logout,
+        resetProtocol
     };
 
     return (
@@ -197,5 +233,9 @@ export function RecoveryProvider({ children }) {
 }
 
 export function useRecovery() {
-    return useContext(RecoveryContext);
+    const context = useContext(RecoveryContext);
+    if (!context) {
+        throw new Error('useRecovery must be used within a RecoveryProvider');
+    }
+    return context;
 }
