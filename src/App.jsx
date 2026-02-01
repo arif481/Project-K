@@ -5,20 +5,78 @@ import HistoryView from './components/HistoryView';
 import EntryForm from './components/EntryForm';
 import AuthTerminal from './components/AuthTerminal';
 import AnalyticsConsole from './components/AnalyticsConsole';
-import { useState } from 'react';
+import { Scene3DBackgroundLite } from './components/Scene3DBackground';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function App() {
   const { currentView, isLoading, user } = useRecovery();
   const [showQuickLog, setShowQuickLog] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if mobile for performance optimization
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Show loading spinner while Auth state initializes
   if (isLoading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-black text-[var(--neon-cyan)] font-mono">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-[var(--neon-cyan)] border-t-transparent rounded-full animate-spin"></div>
-          <div className="text-xs tracking-widest animate-pulse">ESTABLISHING UPLINK...</div>
-        </div>
+      <div className="h-screen w-full flex items-center justify-center bg-[var(--bg-void)] relative overflow-hidden">
+        {/* Animated background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--bg-void)] via-[var(--bg-panel)] to-[var(--bg-void)]" />
+        <div className="absolute inset-0 grid-bg" />
+        
+        <motion.div 
+          className="flex flex-col items-center gap-6 relative z-10"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Animated Logo */}
+          <motion.div
+            className="w-20 h-20 flex items-center justify-center relative"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          >
+            <div 
+              className="absolute inset-0 border-2 border-[var(--neon-cyan-hex)] opacity-50"
+              style={{ clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" }}
+            />
+            <div 
+              className="w-16 h-16 flex items-center justify-center text-[var(--neon-cyan-hex)] text-2xl font-black"
+              style={{ 
+                background: 'linear-gradient(135deg, var(--bg-card), var(--bg-void))',
+                clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)"
+              }}
+            >
+              K
+            </div>
+          </motion.div>
+          
+          {/* Loading indicator */}
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-32 h-1 bg-[var(--bg-muted)] overflow-hidden">
+              <motion.div
+                className="h-full bg-[var(--neon-cyan-hex)]"
+                initial={{ x: '-100%' }}
+                animate={{ x: '100%' }}
+                transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
+                style={{ width: '50%' }}
+              />
+            </div>
+            <motion.span 
+              className="hud-label text-[var(--neon-cyan-hex)]"
+              animate={{ opacity: [1, 0.5, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              ESTABLISHING UPLINK...
+            </motion.span>
+          </div>
+        </motion.div>
       </div>
     );
   }
@@ -33,59 +91,101 @@ export default function App() {
       case 'dashboard': return <Dashboard />;
       case 'history': return <HistoryView />;
       case 'stats': return (
-        <div className="dashboard p-4">
+        <motion.div 
+          className="dashboard p-4 md:p-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
           <div className="dashboard__header mb-6">
-            <h1 className="text-2xl font-mono text-white tracking-widest border-l-4 border-[var(--neon-cyan)] pl-4">ANALYTICS CONSOLE</h1>
-            <p className="dashboard__subtitle text-[var(--text-secondary)] text-sm mt-2">Deep dive into your recovery metrics</p>
+            <h1 className="text-2xl md:text-3xl font-[var(--font-display)] text-white tracking-widest border-l-4 border-[var(--neon-cyan-hex)] pl-4">
+              TELEMETRY CONSOLE
+            </h1>
+            <p className="hud-label text-[var(--text-secondary)] mt-2 pl-4">
+              DEEP ANALYSIS // RECOVERY METRICS
+            </p>
           </div>
           <AnalyticsConsole />
-        </div>
+        </motion.div>
       );
       case 'entry': return (
-        <div className="dashboard">
-          <div className="dashboard__header">
-            <h1 className="dashboard__title text-gradient">Quick Log</h1>
-            <p className="dashboard__subtitle">Record your progress or a setback</p>
+        <motion.div 
+          className="dashboard p-4 md:p-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <div className="dashboard__header mb-6">
+            <h1 className="text-2xl md:text-3xl font-[var(--font-display)] text-gradient tracking-widest border-l-4 border-[var(--neon-cyan-hex)] pl-4">
+              QUICK LOG
+            </h1>
+            <p className="hud-label text-[var(--text-secondary)] mt-2 pl-4">
+              RECORD PROGRESS // TRACK SETBACKS
+            </p>
           </div>
-          <div className="card" style={{ maxWidth: '600px', margin: '0 auto' }}>
-            <EntryForm
-              initialType="progress"
-              onSubmit={() => {
-                // Optional: redirect to history or dashboard after logging
-              }}
-            />
+          <div className="hud-card max-w-2xl mx-auto">
+            <EntryForm initialType="progress" />
           </div>
-        </div>
+        </motion.div>
       );
       default: return <Dashboard />;
     }
   };
 
   return (
-    <div className="app bg-black min-h-screen">
+    <div className="app bg-[var(--bg-void)] min-h-screen relative">
+      {/* Subtle 3D Background for desktop only */}
+      {!isMobile && <Scene3DBackgroundLite />}
+      
       <Header />
-      <main className="main-content fade-in">
-        {renderView()}
+      
+      <main className="main-content relative z-10">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentView}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {renderView()}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* HUD Floating Command Button */}
-      <button
-        className="fixed bottom-6 right-6 w-14 h-14 bg-black border border-[var(--neon-cyan)] text-[var(--neon-cyan)] flex items-center justify-center hover:bg-[var(--neon-cyan)] hover:text-black transition-all duration-300 shadow-[0_0_15px_rgba(0,240,255,0.3)] z-50 group"
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="fixed bottom-6 right-6 w-14 h-14 bg-[var(--bg-card)] border border-[var(--neon-cyan-hex)] text-[var(--neon-cyan-hex)] flex items-center justify-center hover:bg-[var(--neon-cyan-hex)] hover:text-black transition-all duration-300 z-50 group glow-cyan"
         style={{ clipPath: 'polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%)' }}
         onClick={() => setShowQuickLog(true)}
       >
-        <span className="text-2xl font-bold group-hover:scale-110 transition-transform">＋</span>
-      </button>
+        <span className="text-2xl font-bold group-hover:rotate-90 transition-transform duration-300">＋</span>
+      </motion.button>
 
-      {showQuickLog && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm"
-          onClick={(e) => { if (e.target === e.currentTarget) setShowQuickLog(false); }}
-        >
-          <div className="w-full max-w-lg m-4">
-            <EntryForm onClose={() => setShowQuickLog(false)} />
-          </div>
-        </div>
-      )}
+      {/* Quick Log Modal */}
+      <AnimatePresence>
+        {showQuickLog && (
+          <motion.div 
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={(e) => { if (e.target === e.currentTarget) setShowQuickLog(false); }}
+          >
+            <motion.div 
+              className="w-full max-w-lg"
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            >
+              <EntryForm onClose={() => setShowQuickLog(false)} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
