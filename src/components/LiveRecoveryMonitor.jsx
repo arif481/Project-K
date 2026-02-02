@@ -1,14 +1,91 @@
-// LiveRecoveryMonitor.jsx - Real-Time Recovery Data Stream
-import { useState, useEffect, useMemo } from 'react';
+// LiveRecoveryMonitor.jsx - Real-Time Recovery Data Stream v4.0
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRecovery } from '../context/RecoveryContext';
 import { HudCard } from './HudComponents';
 import { getCombinedTimeline } from '../utils/calculations';
 
+// Animated wave component for visual effect
+const WaveIndicator = ({ active, color }) => (
+    <div className="flex items-center gap-0.5 h-4">
+        {[...Array(5)].map((_, i) => (
+            <motion.div
+                key={i}
+                className="w-0.5 rounded-full"
+                style={{ backgroundColor: color }}
+                animate={active ? {
+                    height: ['40%', '100%', '40%'],
+                } : { height: '20%' }}
+                transition={{
+                    duration: 0.5,
+                    repeat: Infinity,
+                    delay: i * 0.1,
+                    ease: 'easeInOut'
+                }}
+            />
+        ))}
+    </div>
+);
+
+// Circular mini indicator
+const StatusOrb = ({ status, size = 8 }) => {
+    const colors = {
+        online: '#00FF88',
+        warning: '#FFE600',
+        offline: '#FF0064',
+        processing: '#00F0FF'
+    };
+    
+    return (
+        <div className="relative" style={{ width: size, height: size }}>
+            <motion.div
+                className="absolute inset-0 rounded-full"
+                style={{ backgroundColor: colors[status] }}
+                animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+            />
+            <div 
+                className="absolute inset-0 rounded-full"
+                style={{ backgroundColor: colors[status] }}
+            />
+        </div>
+    );
+};
+
+// Animated number ticker
+const AnimatedValue = ({ value, prefix = '', suffix = '', decimals = 2, color }) => {
+    const [display, setDisplay] = useState(value);
+    
+    useEffect(() => {
+        const duration = 300;
+        const start = display;
+        const startTime = Date.now();
+        
+        const animate = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setDisplay(start + (value - start) * eased);
+            
+            if (progress < 1) requestAnimationFrame(animate);
+        };
+        
+        requestAnimationFrame(animate);
+    }, [value]);
+    
+    return (
+        <span style={{ color }} className="font-mono font-bold">
+            {prefix}{display.toFixed(decimals)}{suffix}
+        </span>
+    );
+};
+
 export default function LiveRecoveryMonitor() {
     const { advancedStats, progress, userSettings, quitDates, entries } = useRecovery();
     const [hexLines, setHexLines] = useState([]);
     const [isOnline, setIsOnline] = useState(false);
+    const containerRef = useRef(null);
+    const [pulsePhase, setPulsePhase] = useState(0);
 
     // Check if any protocol is active
     useEffect(() => {
@@ -19,6 +96,15 @@ export default function LiveRecoveryMonitor() {
     // Real-time Ticker Values
     const [displayMoney, setDisplayMoney] = useState(0);
     const [displayLife, setDisplayLife] = useState(0);
+
+    // Pulse animation for background
+    useEffect(() => {
+        if (!isOnline) return;
+        const interval = setInterval(() => {
+            setPulsePhase(p => (p + 1) % 360);
+        }, 50);
+        return () => clearInterval(interval);
+    }, [isOnline]);
 
     // Sync with global stats and add micro-interpolation for smooth ticking
     useEffect(() => {
@@ -35,7 +121,6 @@ export default function LiveRecoveryMonitor() {
         const totalDailySave = cigRate + alcRate + canRate;
         const savePerSec = totalDailySave / 86400;
 
-        // Life minutes per second (based on cigarettes primarily - 11 min per cig, 20 per day)
         const lifePerSec = (quitDates.cigarettes ? (11 * 20) / 86400 : 0) +
             (quitDates.cannabis ? (5 * 3) / 86400 : 0) +
             (quitDates.alcohol ? (15 * 4) / 86400 : 0);
@@ -58,8 +143,8 @@ export default function LiveRecoveryMonitor() {
             const newLine = Array(8).fill(0).map(() =>
                 Math.floor(Math.random() * 255).toString(16).toUpperCase().padStart(2, '0')
             ).join(' ');
-            setHexLines(prev => [newLine, ...prev.slice(0, 15)]);
-        }, 150);
+            setHexLines(prev => [newLine, ...prev.slice(0, 12)]);
+        }, 120);
         return () => clearInterval(interval);
     }, [isOnline]);
 
@@ -108,19 +193,37 @@ export default function LiveRecoveryMonitor() {
     // Get upcoming milestone for display
     const nextMilestone = useMemo(() => {
         const timeline = getCombinedTimeline(quitDates, entries, 10);
-        // Find first upcoming (not completed) milestone
         const upcoming = timeline.find(m => !m.isCompleted);
         return upcoming || null;
     }, [quitDates, entries]);
 
+    // Get active protocol count
+    const activeProtocols = Object.values(quitDates).filter(d => !!d).length;
+
     // --- OFFLINE STATE ---
     if (!isOnline) {
         return (
-            <HudCard title="RECOVERY STREAM" className="h-full flex flex-col items-center justify-center bg-black border border-[var(--border-dim)] opacity-50">
-                <div className="text-[var(--text-secondary)] font-mono text-center">
-                    <div className="text-2xl mb-2">⚠</div>
-                    <div>LINK OFFLINE</div>
-                    <div className="text-[10px] mt-2">INITIALIZE A PROTOCOL TO BEGIN DATA STREAM</div>
+            <HudCard title="RECOVERY STREAM" className="h-full flex flex-col relative overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,0,100,0.05)_0%,transparent_50%)]" />
+                
+                <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                    <motion.div
+                        className="w-16 h-16 rounded-full border-2 border-dashed border-[var(--border-dim)] flex items-center justify-center mb-4"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                    >
+                        <span className="text-2xl opacity-40">📡</span>
+                    </motion.div>
+                    <div className="text-[var(--text-secondary)] font-mono">
+                        <div className="text-sm mb-1">LINK OFFLINE</div>
+                        <div className="text-[10px] text-[var(--text-dim)]">
+                            Initialize a protocol to begin<br />real-time data streaming
+                        </div>
+                    </div>
+                    <div className="mt-4 flex gap-2 text-[9px] font-mono text-[var(--text-dim)]">
+                        <StatusOrb status="offline" />
+                        <span>NO SIGNAL</span>
+                    </div>
                 </div>
             </HudCard>
         );
@@ -128,99 +231,187 @@ export default function LiveRecoveryMonitor() {
 
     // --- ONLINE STATE ---
     return (
-        <HudCard title="ACTIVE RECOVERY STREAM" className="h-full flex flex-col bg-black border border-[var(--neon-green)] relative overflow-hidden group">
+        <HudCard 
+            title="ACTIVE RECOVERY STREAM" 
+            className="h-full flex flex-col relative overflow-hidden"
+        >
+            {/* Animated gradient background */}
+            <div 
+                className="absolute inset-0 opacity-30 pointer-events-none"
+                style={{
+                    background: `radial-gradient(circle at ${50 + Math.sin(pulsePhase * 0.02) * 20}% ${50 + Math.cos(pulsePhase * 0.02) * 20}%, rgba(0,255,136,0.1) 0%, transparent 50%)`
+                }}
+            />
 
             {/* Background Matrix Rain Effect */}
-            <div className="absolute inset-0 opacity-10 pointer-events-none select-none font-mono text-[10px] leading-tight text-[var(--neon-green)] overflow-hidden p-2">
+            <div className="absolute inset-0 opacity-5 pointer-events-none select-none font-mono text-[9px] leading-tight text-[var(--neon-green)] overflow-hidden p-2">
                 {hexLines.map((line, i) => (
-                    <div key={i}>{line}</div>
+                    <motion.div 
+                        key={i}
+                        initial={{ opacity: 0.8 }}
+                        animate={{ opacity: 0.2 }}
+                        transition={{ duration: 2 }}
+                    >
+                        {line}
+                    </motion.div>
                 ))}
             </div>
 
             {/* Main Content Layer */}
-            <div className="relative z-10 flex flex-col h-full gap-4">
+            <div ref={containerRef} className="relative z-10 flex flex-col h-full gap-3">
+
+                {/* Status Header */}
+                <div className="flex items-center justify-between py-2 border-b border-[var(--border-dim)]">
+                    <div className="flex items-center gap-3">
+                        <StatusOrb status="online" size={10} />
+                        <span className="text-[10px] font-mono text-[var(--neon-green)]">STREAM ACTIVE</span>
+                    </div>
+                    <WaveIndicator active={true} color="var(--neon-green)" />
+                </div>
 
                 {/* Status Indicators */}
                 <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-[var(--bg-grid)] p-2 border-l border-[var(--neon-green)]">
-                        <div className="text-[9px] text-[var(--text-secondary)] font-mono">ACTIVE PROTOCOLS</div>
-                        <div className="flex items-end gap-2">
-                            <div className="text-xl font-mono font-bold text-[var(--neon-green)]">
-                                {Object.values(quitDates).filter(d => !!d).length}
-                            </div>
-                            <div className="h-4 w-1 bg-[var(--neon-green)] animate-pulse mb-1" />
+                    <motion.div 
+                        className="bg-[rgba(0,255,136,0.05)] p-3 rounded-lg border border-[rgba(0,255,136,0.1)]"
+                        whileHover={{ borderColor: 'rgba(0,255,136,0.3)' }}
+                    >
+                        <div className="text-[9px] text-[var(--text-dim)] font-mono mb-1 flex items-center gap-1">
+                            <span>⚡</span> ACTIVE PROTOCOLS
                         </div>
-                    </div>
-                    <div className="bg-[var(--bg-grid)] p-2 border-l border-[var(--neon-cyan)]">
-                        <div className="text-[9px] text-[var(--text-secondary)] font-mono">STREAM STATUS</div>
+                        <div className="flex items-end gap-2">
+                            <div className="text-2xl font-mono font-black text-[var(--neon-green)]">
+                                {activeProtocols}
+                            </div>
+                            <div className="text-[10px] text-[var(--text-dim)] mb-1">/3</div>
+                        </div>
+                    </motion.div>
+                    
+                    <motion.div 
+                        className="bg-[rgba(0,240,255,0.05)] p-3 rounded-lg border border-[rgba(0,240,255,0.1)]"
+                        whileHover={{ borderColor: 'rgba(0,240,255,0.3)' }}
+                    >
+                        <div className="text-[9px] text-[var(--text-dim)] font-mono mb-1 flex items-center gap-1">
+                            <span>📊</span> STREAM STATUS
+                        </div>
                         <div className="flex items-end gap-2">
                             <div className="text-xl font-mono font-bold text-[var(--neon-cyan)]">LIVE</div>
-                            <div className="h-4 w-1 bg-[var(--neon-cyan)] animate-pulse mb-1" />
+                            <motion.div 
+                                className="h-4 w-1 bg-[var(--neon-cyan)] mb-1 rounded-full"
+                                animate={{ opacity: [1, 0.3, 1] }}
+                                transition={{ duration: 1, repeat: Infinity }}
+                            />
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
 
                 {/* Live Tickers */}
-                <div className="flex flex-col gap-1 border-y border-[var(--border-dim)] py-2 bg-black/50">
-                    <div className="flex justify-between items-center text-xs font-mono">
-                        <span className="text-[var(--text-secondary)]">CAPITAL_SAVED:</span>
-                        <span className="text-[var(--neon-green)] tracking-wider">₹{displayMoney.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-xs font-mono">
-                        <span className="text-[var(--text-secondary)]">LIFE_REGAINED:</span>
-                        <span className="text-[var(--neon-cyan)] tracking-wider">+{displayLife.toFixed(1)} MIN</span>
+                <div className="bg-[rgba(0,0,0,0.3)] rounded-lg p-3 border border-[var(--border-dim)]">
+                    <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                            <span className="text-[10px] text-[var(--text-dim)] font-mono flex items-center gap-1">
+                                <span>💰</span> CAPITAL_SAVED
+                            </span>
+                            <AnimatedValue 
+                                value={displayMoney} 
+                                prefix="₹" 
+                                color="#00FF88" 
+                            />
+                        </div>
+                        <div className="h-px bg-gradient-to-r from-transparent via-[var(--border-dim)] to-transparent" />
+                        <div className="flex justify-between items-center">
+                            <span className="text-[10px] text-[var(--text-dim)] font-mono flex items-center gap-1">
+                                <span>⏱️</span> LIFE_REGAINED
+                            </span>
+                            <AnimatedValue 
+                                value={displayLife} 
+                                prefix="+" 
+                                suffix=" MIN" 
+                                decimals={1}
+                                color="#00F0FF" 
+                            />
+                        </div>
                     </div>
                 </div>
 
                 {/* Next Milestone Indicator */}
                 {nextMilestone && (
-                    <div className="bg-[var(--bg-grid)] p-2 border border-[var(--border-dim)]">
-                        <div className="text-[9px] text-[var(--text-secondary)] font-mono mb-1">NEXT MILESTONE</div>
-                        <div className="text-xs font-mono text-[var(--neon-yellow)] truncate">
-                            ⏱ {nextMilestone.name}
+                    <motion.div 
+                        className="bg-[rgba(255,230,0,0.05)] p-3 rounded-lg border border-[rgba(255,230,0,0.15)]"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                    >
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <div className="text-[9px] text-[var(--text-dim)] font-mono mb-1 flex items-center gap-1">
+                                    <span>🎯</span> NEXT MILESTONE
+                                </div>
+                                <div className="text-xs font-mono text-[var(--neon-yellow)] truncate max-w-[150px]">
+                                    {nextMilestone.name}
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <div className="text-[9px] text-[var(--text-dim)] mb-1">ETA</div>
+                                <div className="text-sm font-mono text-white">
+                                    {nextMilestone.timeToEventLabel || 'Soon'}
+                                </div>
+                            </div>
                         </div>
-                        <div className="text-[10px] text-[var(--text-secondary)] font-mono">
-                            {nextMilestone.timeToEventLabel || 'Soon'}
-                        </div>
-                    </div>
+                    </motion.div>
                 )}
 
                 {/* Real Log Output */}
-                <div className="flex-1 font-mono text-[10px] flex flex-col overflow-hidden">
-                    <div className="text-[9px] text-[var(--text-secondary)] mb-1 border-b border-[var(--border-dim)] pb-1">
+                <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+                    <div className="text-[9px] text-[var(--text-dim)] mb-2 flex items-center gap-2 font-mono">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--neon-cyan)] animate-pulse" />
                         ACTIVITY LOG
                     </div>
-                    <div className="flex-1 overflow-y-auto no-scrollbar">
+                    <div className="flex-1 overflow-y-auto no-scrollbar bg-[rgba(0,0,0,0.2)] rounded-lg p-2">
                         <AnimatePresence initial={false}>
                             {streamData.length > 0 ? (
-                                streamData.map((log) => (
+                                streamData.map((log, idx) => (
                                     <motion.div
                                         key={log.id}
                                         initial={{ opacity: 0, x: -10 }}
                                         animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0 }}
-                                        className={`mb-1 truncate ${log.type === 'milestone' ? 'text-[var(--neon-yellow)]' :
-                                            log.type === 'warning' ? 'text-[var(--neon-magenta)]' :
-                                                log.type === 'info' ? 'text-[var(--neon-cyan)]' :
-                                                    'text-[var(--neon-green)]'
-                                            }`}
+                                        exit={{ opacity: 0, x: 10 }}
+                                        transition={{ delay: idx * 0.05 }}
+                                        className={`mb-1.5 py-1 px-2 rounded text-[10px] font-mono truncate
+                                            ${log.type === 'milestone' ? 'bg-[rgba(255,230,0,0.1)] text-[var(--neon-yellow)]' :
+                                            log.type === 'warning' ? 'bg-[rgba(255,0,100,0.1)] text-[var(--neon-magenta)]' :
+                                            log.type === 'info' ? 'bg-[rgba(0,240,255,0.1)] text-[var(--neon-cyan)]' :
+                                            'bg-[rgba(0,255,136,0.1)] text-[var(--neon-green)]'
+                                        }`}
                                     >
                                         {log.text}
                                     </motion.div>
                                 ))
                             ) : (
-                                <div className="text-[var(--text-secondary)] text-center py-4">
+                                <div className="text-[var(--text-dim)] text-center py-6 text-[10px]">
+                                    <span className="text-lg block mb-2">📋</span>
                                     No activity logged yet.<br />
-                                    Use the check-in buttons to log your progress.
+                                    Use check-in buttons to log progress.
                                 </div>
                             )}
                         </AnimatePresence>
                     </div>
                 </div>
+
+                {/* Footer Status */}
+                <div className="flex items-center justify-between text-[9px] font-mono text-[var(--text-dim)] pt-2 border-t border-[var(--border-dim)]">
+                    <div className="flex items-center gap-2">
+                        <motion.div 
+                            className="w-1.5 h-1.5 rounded-full bg-[var(--neon-green)]"
+                            animate={{ opacity: [1, 0.4, 1] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                        />
+                        <span>LINK: STABLE</span>
+                    </div>
+                    <span>LATENCY: 0ms</span>
+                </div>
             </div>
 
             {/* CRT Scanline Overlay */}
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)50%,rgba(0,0,0,0.1)50%)] bg-[length:100%_4px] pointer-events-none z-20" />
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)50%,rgba(0,0,0,0.05)50%)] bg-[length:100%_4px] pointer-events-none z-20" />
         </HudCard>
     );
 }

@@ -1,6 +1,6 @@
-// SubstanceDashboard.jsx - Per-Substance Detailed Recovery Card
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+// SubstanceDashboard.jsx - Per-Substance Detailed Recovery Card v4.0
+import { useState, useEffect, useRef, memo, useCallback } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { useRecovery } from '../context/RecoveryContext';
 import { HudCard } from './HudComponents';
 import { calculateRecoveryProgress, getStreakInfo } from '../utils/calculations';
@@ -10,35 +10,170 @@ const SUBSTANCE_CONFIG = {
     cigarettes: {
         label: 'NICOTINE',
         icon: '🚬',
-        lifeMinutesPerUnit: 11, // 11 min per cigarette
-        usagePerDay: 20, // avg pack per day
-        color: 'var(--neon-cyan)'
+        lifeMinutesPerUnit: 11,
+        usagePerDay: 20,
+        color: '#00F0FF',
+        gradient: 'linear-gradient(135deg, #00F0FF 0%, #0080FF 100%)',
+        bgGlow: 'rgba(0, 240, 255, 0.15)',
+        milestones: [1, 3, 7, 14, 30, 60, 90, 180, 365],
+        healthBenefits: [
+            { day: 1, benefit: 'Heart rate normalizing' },
+            { day: 3, benefit: 'Nicotine leaving system' },
+            { day: 14, benefit: 'Circulation improving' },
+            { day: 30, benefit: 'Lung function increasing' },
+            { day: 90, benefit: 'Cilia regenerating' },
+        ]
     },
     cannabis: {
         label: 'CANNABIS',
         icon: '🌿',
         lifeMinutesPerUnit: 5,
         usagePerDay: 3,
-        color: 'var(--neon-green)'
+        color: '#00FF88',
+        gradient: 'linear-gradient(135deg, #00FF88 0%, #00CC66 100%)',
+        bgGlow: 'rgba(0, 255, 136, 0.15)',
+        milestones: [1, 3, 7, 14, 30, 60, 90, 180, 365],
+        healthBenefits: [
+            { day: 1, benefit: 'THC detox beginning' },
+            { day: 7, benefit: 'Sleep patterns improving' },
+            { day: 14, benefit: 'Memory clarity returning' },
+            { day: 30, benefit: 'Motivation increasing' },
+            { day: 90, benefit: 'Full cognitive recovery' },
+        ]
     },
     alcohol: {
         label: 'ALCOHOL',
         icon: '🍺',
         lifeMinutesPerUnit: 15,
         usagePerDay: 4,
-        color: 'var(--neon-magenta)'
+        color: '#FF0064',
+        gradient: 'linear-gradient(135deg, #FF0064 0%, #FF6B6B 100%)',
+        bgGlow: 'rgba(255, 0, 100, 0.15)',
+        milestones: [1, 3, 7, 14, 30, 60, 90, 180, 365],
+        healthBenefits: [
+            { day: 1, benefit: 'Liver beginning recovery' },
+            { day: 7, benefit: 'Sleep quality improving' },
+            { day: 14, benefit: 'Skin hydration returning' },
+            { day: 30, benefit: 'Blood pressure normalizing' },
+            { day: 90, benefit: 'Liver fully regenerating' },
+        ]
     }
+};
+
+// Animated counter component
+const AnimatedCounter = memo(({ value, format = 'number', color }) => {
+    const [displayValue, setDisplayValue] = useState(value);
+    
+    useEffect(() => {
+        const duration = 500;
+        const startTime = Date.now();
+        const startValue = displayValue;
+        
+        const animate = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easeProgress = 1 - Math.pow(1 - progress, 3);
+            const current = startValue + (value - startValue) * easeProgress;
+            setDisplayValue(current);
+            
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            }
+        };
+        
+        requestAnimationFrame(animate);
+    }, [value]);
+    
+    const formattedValue = format === 'currency' 
+        ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 }).format(displayValue)
+        : format === 'time'
+        ? formatTimeValue(displayValue)
+        : Math.floor(displayValue);
+    
+    return <span style={{ color }}>{formattedValue}</span>;
+});
+
+// Helper for time formatting
+function formatTimeValue(minutes) {
+    if (minutes < 60) return `${Math.floor(minutes)}m`;
+    if (minutes < 1440) return `${(minutes / 60).toFixed(1)}h`;
+    return `${(minutes / 1440).toFixed(1)}d`;
+}
+
+// Circular Progress Ring
+const CircularProgress = memo(({ progress, color, size = 120, strokeWidth = 8 }) => {
+    const radius = (size - strokeWidth) / 2;
+    const circumference = radius * 2 * Math.PI;
+    const offset = circumference - (progress / 100) * circumference;
+    
+    return (
+        <svg width={size} height={size} className="transform -rotate-90">
+            {/* Background ring */}
+            <circle
+                cx={size / 2}
+                cy={size / 2}
+                r={radius}
+                fill="none"
+                stroke="rgba(255,255,255,0.1)"
+                strokeWidth={strokeWidth}
+            />
+            {/* Progress ring */}
+            <motion.circle
+                cx={size / 2}
+                cy={size / 2}
+                r={radius}
+                fill="none"
+                stroke={color}
+                strokeWidth={strokeWidth}
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                initial={{ strokeDashoffset: circumference }}
+                animate={{ strokeDashoffset: offset }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                style={{ filter: `drop-shadow(0 0 8px ${color})` }}
+            />
+        </svg>
+    );
+});
+
+// Milestone indicator
+const MilestoneIndicator = ({ days, milestones, color }) => {
+    const currentMilestoneIndex = milestones.findIndex(m => m > days);
+    const nextMilestone = milestones[currentMilestoneIndex] || milestones[milestones.length - 1];
+    const prevMilestone = milestones[currentMilestoneIndex - 1] || 0;
+    const progressToNext = Math.min(((days - prevMilestone) / (nextMilestone - prevMilestone)) * 100, 100);
+    
+    return (
+        <div className="relative">
+            <div className="flex justify-between text-[9px] font-mono text-[var(--text-dim)] mb-1">
+                <span>DAY {prevMilestone}</span>
+                <span className="text-[var(--text-secondary)]">NEXT: DAY {nextMilestone}</span>
+            </div>
+            <div className="h-1.5 bg-[rgba(255,255,255,0.1)] rounded-full overflow-hidden">
+                <motion.div
+                    className="h-full rounded-full"
+                    style={{ background: color }}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progressToNext}%` }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                />
+            </div>
+        </div>
+    );
 };
 
 export default function SubstanceDashboard({ substance, onLogEntry, onInitialize }) {
     const { progress, quitDates, userSettings, entries, addEntry } = useRecovery();
     const [tickingMoney, setTickingMoney] = useState(0);
     const [tickingLife, setTickingLife] = useState(0);
+    const [showHealthInfo, setShowHealthInfo] = useState(false);
+    const cardRef = useRef(null);
 
     const config = SUBSTANCE_CONFIG[substance];
     const isActive = !!quitDates[substance];
     const substanceProgress = progress[substance];
     const costPerDay = userSettings?.costs?.[substance] || 350;
+    const days = substanceProgress?.streak?.days || 0;
 
     // Live ticking effect for money and life
     useEffect(() => {
@@ -61,10 +196,19 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
         };
 
         updateTickers();
-        const interval = setInterval(updateTickers, 1000); // Tick every second
+        const interval = setInterval(updateTickers, 1000);
 
         return () => clearInterval(interval);
     }, [isActive, quitDates, substance, costPerDay, config]);
+
+    // Get current health benefit
+    const getCurrentBenefit = useCallback(() => {
+        const benefits = config.healthBenefits;
+        for (let i = benefits.length - 1; i >= 0; i--) {
+            if (days >= benefits[i].day) return benefits[i];
+        }
+        return benefits[0];
+    }, [days, config]);
 
     // Quick action handlers
     const handleLogCleanDay = () => {
@@ -83,20 +227,6 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
     };
 
     // Format helpers
-    const formatMoney = (amount) => {
-        return new Intl.NumberFormat('en-IN', {
-            style: 'currency',
-            currency: 'INR',
-            maximumFractionDigits: 2
-        }).format(amount);
-    };
-
-    const formatLife = (minutes) => {
-        if (minutes < 60) return `${Math.floor(minutes)}m`;
-        if (minutes < 1440) return `${(minutes / 60).toFixed(1)}h`;
-        return `${(minutes / 1440).toFixed(1)}d`;
-    };
-
     const formatQuitDate = (dateStr) => {
         if (!dateStr) return 'N/A';
         const date = new Date(dateStr);
@@ -106,124 +236,250 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
     // --- INACTIVE STATE ---
     if (!isActive) {
         return (
-            <HudCard className="p-4 opacity-50 border-dashed">
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                        <span className="text-2xl">{config.icon}</span>
-                        <span className="text-sm font-bold uppercase tracking-widest text-white">{config.label}</span>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="relative group"
+            >
+                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent rounded-xl" />
+                <HudCard className="p-5 border-dashed border-[var(--border-dim)] opacity-60 hover:opacity-80 transition-opacity">
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-xl bg-[rgba(255,255,255,0.05)] flex items-center justify-center text-2xl">
+                                {config.icon}
+                            </div>
+                            <div>
+                                <span className="text-sm font-bold uppercase tracking-widest text-white block">{config.label}</span>
+                                <span className="text-[10px] text-[var(--text-dim)]">PROTOCOL OFFLINE</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-red-500/50" />
+                            <span className="text-[10px] text-red-400">INACTIVE</span>
+                        </div>
                     </div>
-                    <div className="w-2 h-2 rounded-full bg-red-500" />
-                </div>
-                <div className="text-center py-4">
-                    <p className="text-[var(--text-secondary)] text-xs mb-4">Protocol not initialized</p>
-                    <button
+                    
+                    <div className="text-center py-6 border-y border-[var(--border-dim)] border-dashed">
+                        <div className="text-4xl mb-2 opacity-30">{config.icon}</div>
+                        <p className="text-[var(--text-secondary)] text-xs mb-1">Recovery protocol not initialized</p>
+                        <p className="text-[var(--text-dim)] text-[10px]">Begin your journey to freedom</p>
+                    </div>
+                    
+                    <motion.button
                         onClick={() => onInitialize && onInitialize(substance)}
-                        className="w-full border border-[var(--text-secondary)] text-[var(--text-secondary)] hover:border-white hover:text-white text-xs py-2 font-mono transition-colors"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="w-full mt-6 py-3 border border-[var(--text-secondary)] text-[var(--text-secondary)] 
+                                   hover:border-white hover:text-white hover:bg-white/5
+                                   text-xs font-mono transition-all duration-300 rounded-lg
+                                   flex items-center justify-center gap-2"
                     >
-                        INITIALIZE RECOVERY
-                    </button>
-                </div>
-            </HudCard>
+                        <span className="text-lg">⚡</span>
+                        INITIALIZE RECOVERY PROTOCOL
+                    </motion.button>
+                </HudCard>
+            </motion.div>
         );
     }
 
     // --- ACTIVE STATE ---
+    const currentBenefit = getCurrentBenefit();
+    
     return (
         <motion.div
+            ref={cardRef}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            className="relative group"
         >
-            <HudCard
-                className="p-4 border-l-4"
-                style={{ borderLeftColor: config.color }}
-            >
-                {/* HEADER */}
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                        <span className="text-2xl">{config.icon}</span>
-                        <span className="text-sm font-bold uppercase tracking-widest text-white">{config.label}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-[var(--neon-green)] animate-pulse" />
-                        <span className="text-[10px] text-[var(--neon-green)]">ACTIVE</span>
-                    </div>
+            {/* Glow effect */}
+            <div 
+                className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"
+                style={{ background: config.bgGlow }}
+            />
+            
+            <HudCard className="p-0 overflow-hidden relative">
+                {/* Colored top border */}
+                <div 
+                    className="h-1 w-full"
+                    style={{ background: config.gradient }}
+                />
+                
+                {/* Animated background pattern */}
+                <div className="absolute inset-0 opacity-[0.03]">
+                    <div className="absolute inset-0 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
                 </div>
 
-                {/* DAYS CLEAN - HERO STAT */}
-                <div className="text-center py-3 border-y border-[var(--border-dim)]">
-                    <div className="text-5xl font-mono font-black text-white mb-1">
-                        {substanceProgress?.streak?.days || 0}
-                    </div>
-                    <div className="text-[10px] text-[var(--text-secondary)] tracking-widest">DAYS CLEAN</div>
-                </div>
-
-                {/* STATS GRID */}
-                <div className="grid grid-cols-2 gap-3 my-4">
-                    {/* Money Saved */}
-                    <div className="bg-[var(--bg-grid)] p-3 rounded">
-                        <div className="text-[10px] text-[var(--text-secondary)] mb-1">CAPITAL SAVED</div>
-                        <div className="text-lg font-mono font-bold text-[var(--neon-green)]">
-                            {formatMoney(tickingMoney)}
+                <div className="p-5 relative">
+                    {/* HEADER */}
+                    <div className="flex items-center justify-between mb-5">
+                        <div className="flex items-center gap-3">
+                            <motion.div 
+                                className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl relative"
+                                style={{ background: `${config.bgGlow}` }}
+                                whileHover={{ scale: 1.1, rotate: 5 }}
+                            >
+                                {config.icon}
+                                <div className="absolute inset-0 rounded-xl animate-pulse" style={{ boxShadow: `0 0 20px ${config.color}40` }} />
+                            </motion.div>
+                            <div>
+                                <span className="text-sm font-bold uppercase tracking-widest text-white block">{config.label}</span>
+                                <span className="text-[10px] text-[var(--text-dim)]">RECOVERY ACTIVE</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <motion.div 
+                                className="w-2 h-2 rounded-full"
+                                style={{ backgroundColor: config.color }}
+                                animate={{ scale: [1, 1.3, 1], opacity: [1, 0.7, 1] }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                            />
+                            <span className="text-[10px] font-mono" style={{ color: config.color }}>ONLINE</span>
                         </div>
                     </div>
 
-                    {/* Life Regained */}
-                    <div className="bg-[var(--bg-grid)] p-3 rounded">
-                        <div className="text-[10px] text-[var(--text-secondary)] mb-1">LIFE REGAINED</div>
-                        <div className="text-lg font-mono font-bold text-[var(--neon-cyan)]">
-                            {formatLife(tickingLife)}
+                    {/* HERO SECTION - Days Clean with Circular Progress */}
+                    <div className="flex items-center justify-center gap-6 py-4 border-y border-[var(--border-dim)]">
+                        <div className="relative">
+                            <CircularProgress 
+                                progress={Math.min((substanceProgress?.progress || 0), 100)} 
+                                color={config.color} 
+                                size={100}
+                                strokeWidth={6}
+                            />
+                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                <div className="text-3xl font-mono font-black text-white">
+                                    {days}
+                                </div>
+                                <div className="text-[8px] text-[var(--text-dim)] tracking-wider">DAYS</div>
+                            </div>
+                        </div>
+                        
+                        <div className="text-left">
+                            <div className="text-[10px] text-[var(--text-secondary)] mb-1">CURRENT BENEFIT</div>
+                            <div className="text-sm text-white font-medium mb-2">{currentBenefit?.benefit}</div>
+                            <button 
+                                onClick={() => setShowHealthInfo(!showHealthInfo)}
+                                className="text-[10px] font-mono flex items-center gap-1 hover:opacity-80"
+                                style={{ color: config.color }}
+                            >
+                                {showHealthInfo ? '▼' : '▶'} VIEW ALL BENEFITS
+                            </button>
                         </div>
                     </div>
 
-                    {/* Recovery Progress */}
-                    <div className="bg-[var(--bg-grid)] p-3 rounded">
-                        <div className="text-[10px] text-[var(--text-secondary)] mb-1">RECOVERY</div>
-                        <div className="text-lg font-mono font-bold text-white">
-                            {Math.round(substanceProgress?.progress || 0)}%
-                        </div>
+                    {/* Health Benefits Dropdown */}
+                    <AnimatePresence>
+                        {showHealthInfo && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                className="overflow-hidden"
+                            >
+                                <div className="py-3 space-y-2 border-b border-[var(--border-dim)]">
+                                    {config.healthBenefits.map((b, i) => (
+                                        <div 
+                                            key={i} 
+                                            className={`flex items-center gap-2 text-[10px] ${days >= b.day ? 'opacity-100' : 'opacity-40'}`}
+                                        >
+                                            <span style={{ color: days >= b.day ? config.color : 'var(--text-dim)' }}>
+                                                {days >= b.day ? '✓' : '○'}
+                                            </span>
+                                            <span className="text-[var(--text-dim)]">Day {b.day}:</span>
+                                            <span className="text-white">{b.benefit}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    {/* STATS GRID */}
+                    <div className="grid grid-cols-2 gap-3 my-4">
+                        {/* Money Saved */}
+                        <motion.div 
+                            className="bg-[rgba(0,255,136,0.05)] p-3 rounded-lg border border-[rgba(0,255,136,0.1)]"
+                            whileHover={{ scale: 1.02, borderColor: 'rgba(0,255,136,0.3)' }}
+                        >
+                            <div className="text-[9px] text-[var(--text-dim)] mb-1 flex items-center gap-1">
+                                <span>💰</span> CAPITAL SAVED
+                            </div>
+                            <div className="text-lg font-mono font-bold">
+                                <AnimatedCounter value={tickingMoney} format="currency" color="#00FF88" />
+                            </div>
+                        </motion.div>
+
+                        {/* Life Regained */}
+                        <motion.div 
+                            className="bg-[rgba(0,240,255,0.05)] p-3 rounded-lg border border-[rgba(0,240,255,0.1)]"
+                            whileHover={{ scale: 1.02, borderColor: 'rgba(0,240,255,0.3)' }}
+                        >
+                            <div className="text-[9px] text-[var(--text-dim)] mb-1 flex items-center gap-1">
+                                <span>⏱️</span> LIFE REGAINED
+                            </div>
+                            <div className="text-lg font-mono font-bold">
+                                <AnimatedCounter value={tickingLife} format="time" color="#00F0FF" />
+                            </div>
+                        </motion.div>
+
+                        {/* Recovery Progress */}
+                        <motion.div 
+                            className="bg-[rgba(147,51,234,0.05)] p-3 rounded-lg border border-[rgba(147,51,234,0.1)]"
+                            whileHover={{ scale: 1.02, borderColor: 'rgba(147,51,234,0.3)' }}
+                        >
+                            <div className="text-[9px] text-[var(--text-dim)] mb-1 flex items-center gap-1">
+                                <span>📊</span> RECOVERY
+                            </div>
+                            <div className="text-lg font-mono font-bold text-[#9333EA]">
+                                {Math.round(substanceProgress?.progress || 0)}%
+                            </div>
+                        </motion.div>
+
+                        {/* Quit Date */}
+                        <motion.div 
+                            className="bg-[rgba(255,255,255,0.02)] p-3 rounded-lg border border-[rgba(255,255,255,0.05)]"
+                            whileHover={{ scale: 1.02, borderColor: 'rgba(255,255,255,0.1)' }}
+                        >
+                            <div className="text-[9px] text-[var(--text-dim)] mb-1 flex items-center gap-1">
+                                <span>📅</span> INITIATED
+                            </div>
+                            <div className="text-sm font-mono text-white">
+                                {formatQuitDate(quitDates[substance])}
+                            </div>
+                        </motion.div>
                     </div>
 
-                    {/* Quit Date */}
-                    <div className="bg-[var(--bg-grid)] p-3 rounded">
-                        <div className="text-[10px] text-[var(--text-secondary)] mb-1">INITIATED</div>
-                        <div className="text-xs font-mono text-white">
-                            {formatQuitDate(quitDates[substance])}
-                        </div>
+                    {/* MILESTONE PROGRESS */}
+                    <div className="mb-4">
+                        <MilestoneIndicator days={days} milestones={config.milestones} color={config.gradient} />
                     </div>
-                </div>
 
-                {/* PROGRESS BAR */}
-                <div className="mb-4">
-                    <div className="flex justify-between text-[10px] text-[var(--text-secondary)] mb-1">
-                        <span>SYSTEM RECOVERY</span>
-                        <span>{Math.round(substanceProgress?.progress || 0)}%</span>
+                    {/* DAILY CHECK-IN ACTIONS */}
+                    <div className="flex gap-2">
+                        <motion.button
+                            onClick={handleLogCleanDay}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="flex-1 py-3 rounded-lg text-xs font-mono font-bold transition-all duration-300
+                                       bg-[rgba(0,255,136,0.1)] hover:bg-[rgba(0,255,136,0.2)] text-[#00FF88]
+                                       border border-[rgba(0,255,136,0.2)] hover:border-[rgba(0,255,136,0.4)]
+                                       flex items-center justify-center gap-2"
+                        >
+                            <span>✓</span> CLEAN TODAY
+                        </motion.button>
+                        <motion.button
+                            onClick={handleLogRelapse}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="px-4 py-3 rounded-lg text-xs font-mono transition-all duration-300
+                                       bg-[rgba(255,0,100,0.1)] hover:bg-[rgba(255,0,100,0.2)] text-[#FF0064]
+                                       border border-[rgba(255,0,100,0.2)] hover:border-[rgba(255,0,100,0.4)]"
+                        >
+                            ⚠ LOG
+                        </motion.button>
                     </div>
-                    <div className="w-full h-2 bg-[var(--bg-grid)] rounded-full overflow-hidden">
-                        <motion.div
-                            className="h-full rounded-full"
-                            style={{ backgroundColor: config.color }}
-                            initial={{ width: 0 }}
-                            animate={{ width: `${substanceProgress?.progress || 0}%` }}
-                            transition={{ duration: 1, ease: 'easeOut' }}
-                        />
-                    </div>
-                </div>
-
-                {/* DAILY CHECK-IN ACTIONS */}
-                <div className="flex gap-2">
-                    <button
-                        onClick={handleLogCleanDay}
-                        className="flex-1 bg-[var(--bg-grid)] hover:bg-[var(--neon-green)] hover:text-black text-[var(--neon-green)] text-xs font-mono py-2 border border-[var(--border-dim)] transition-all duration-200"
-                    >
-                        ✓ CLEAN TODAY
-                    </button>
-                    <button
-                        onClick={handleLogRelapse}
-                        className="px-4 bg-[var(--bg-grid)] hover:bg-[var(--neon-magenta)] hover:text-white text-[var(--neon-magenta)] text-xs font-mono py-2 border border-[var(--border-dim)] transition-all duration-200"
-                    >
-                        ⚠ RELAPSE
-                    </button>
                 </div>
             </HudCard>
         </motion.div>
