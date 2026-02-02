@@ -173,17 +173,32 @@ export default function AnalyticsConsole() {
         });
 
         const calcAvg = (arr, key, defaultVal = 50) => {
-            if (arr.length === 0) return defaultVal;
-            return Math.round(arr.reduce((acc, e) => acc + (e[key] || defaultVal), 0) / arr.length);
+            // Filter entries that have valid numeric values for the key
+            const validEntries = arr.filter(e => typeof e[key] === 'number' && !isNaN(e[key]));
+            if (validEntries.length === 0) return defaultVal;
+            const sum = validEntries.reduce((acc, e) => acc + e[key], 0);
+            const avg = sum / validEntries.length;
+            // Clamp to 0-100 range
+            return Math.min(100, Math.max(0, Math.round(avg)));
         };
 
-        const thisWeekMood = calcAvg(thisWeekEntries, 'feeling');
-        const lastWeekMood = calcAvg(lastWeekEntries, 'feeling');
-        const moodTrend = lastWeekMood > 0 ? Math.round(((thisWeekMood - lastWeekMood) / lastWeekMood) * 100) : 0;
+        const thisWeekMood = calcAvg(thisWeekEntries, 'feeling', 50);
+        const lastWeekMood = calcAvg(lastWeekEntries, 'feeling', 50);
+        // Calculate trend but cap it to reasonable range (-100 to +100)
+        let moodTrend = 0;
+        if (lastWeekMood > 0 && thisWeekEntries.some(e => typeof e.feeling === 'number')) {
+            moodTrend = Math.round(((thisWeekMood - lastWeekMood) / lastWeekMood) * 100);
+            moodTrend = Math.min(100, Math.max(-100, moodTrend));
+        }
 
         const thisWeekCraving = calcAvg(thisWeekEntries, 'craving', 0);
         const lastWeekCraving = calcAvg(lastWeekEntries, 'craving', 0);
-        const cravingTrend = lastWeekCraving > 0 ? Math.round(((lastWeekCraving - thisWeekCraving) / lastWeekCraving) * 100) : 0;
+        // For craving, lower is better so we invert the trend
+        let cravingTrend = 0;
+        if (lastWeekCraving > 0 && thisWeekEntries.some(e => typeof e.craving === 'number')) {
+            cravingTrend = Math.round(((lastWeekCraving - thisWeekCraving) / lastWeekCraving) * 100);
+            cravingTrend = Math.min(100, Math.max(-100, cravingTrend));
+        }
 
         const relapseCount = thisWeekEntries.filter(e => e.type === 'relapse').length;
         const logCount = thisWeekEntries.length;
