@@ -5,6 +5,19 @@ import { useRecovery } from '../context/RecoveryContext';
 import { HudCard } from './HudComponents';
 import { getCombinedTimeline } from '../utils/calculations';
 
+// Helper to format time ago
+const formatTimeAgo = (timestamp) => {
+    const seconds = Math.floor((Date.now() - timestamp) / 1000);
+    if (seconds < 60) return 'now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d`;
+    return `${Math.floor(days / 7)}w`;
+};
+
 // Animated wave component for visual effect
 const WaveIndicator = ({ active, color }) => (
     <div className="flex items-center gap-0.5 h-4">
@@ -151,34 +164,47 @@ export default function LiveRecoveryMonitor() {
     // Build real stream data from user entries + milestones
     const streamData = useMemo(() => {
         const logs = [];
+        const substanceIcons = {
+            cigarettes: '🚬',
+            cannabis: '🌿',
+            alcohol: '🍺'
+        };
 
         // 1. Add recent user entries (last 5)
         const recentEntries = entries.slice(0, 5);
         for (const entry of recentEntries) {
             const type = entry.type === 'relapse' ? 'warning' :
-                entry.type === 'quit' ? 'milestone' : 'info';
-            const icon = entry.type === 'relapse' ? '⚠' :
-                entry.type === 'quit' ? '🚀' : '✓';
-            const substance = entry.substance?.toUpperCase() || 'SYSTEM';
+                entry.type === 'quit' ? 'success' : 'info';
+            const substance = entry.substance?.toLowerCase() || 'system';
+            const icon = substanceIcons[substance] || '📋';
+            const actionText = entry.type === 'relapse' ? 'SETBACK' :
+                entry.type === 'quit' ? 'PROTOCOL STARTED' : 
+                entry.notes || 'CHECK-IN';
 
             logs.push({
                 id: entry.id || entry.timestamp,
-                text: `${icon} [${substance}] ${entry.notes || entry.type?.toUpperCase()}`,
+                icon,
+                substance: substance.toUpperCase(),
+                action: actionText,
                 type,
                 timestamp: entry.timestamp || Date.now()
             });
         }
 
-        // 2. Add completed milestones from progress
+        // 2. Add completed milestones from progress (use label, not name)
         for (const [substance, data] of Object.entries(progress)) {
-            if (data && data.completedMilestones) {
-                const recentMilestones = data.completedMilestones.slice(0, 3);
+            if (data && data.completedMilestones && Array.isArray(data.completedMilestones)) {
+                // Get only the most recent 2 milestones per substance
+                const recentMilestones = data.completedMilestones.slice(-2);
                 for (const m of recentMilestones) {
+                    const milestoneLabel = m.label || m.name || `${m.time ? Math.round(m.time / 3600000) + 'h' : 'Unknown'}`;
                     logs.push({
-                        id: `${substance}-${m.name}`,
-                        text: `🏆 [${substance.toUpperCase()}] ${m.name}`,
-                        type: 'milestone',
-                        timestamp: m.actualTime || Date.now()
+                        id: `${substance}-${m.id || m.label || Math.random()}`,
+                        icon: '🏆',
+                        substance: substance.toUpperCase(),
+                        action: `MILESTONE: ${milestoneLabel}`,
+                        type: 'achievement',
+                        timestamp: m.actualTime || Date.now() - (data.completedMilestones.indexOf(m) * 1000)
                     });
                 }
             }
@@ -187,7 +213,7 @@ export default function LiveRecoveryMonitor() {
         // Sort by timestamp (newest first) and limit
         return logs
             .sort((a, b) => b.timestamp - a.timestamp)
-            .slice(0, 8);
+            .slice(0, 6);
     }, [entries, progress]);
 
     // Get upcoming milestone for display
@@ -346,7 +372,7 @@ export default function LiveRecoveryMonitor() {
                                     <span>🎯</span> NEXT MILESTONE
                                 </div>
                                 <div className="text-xs font-mono text-[var(--neon-yellow)] truncate max-w-[150px]">
-                                    {nextMilestone.name}
+                                    {nextMilestone.label || nextMilestone.name || 'Unknown'}
                                 </div>
                             </div>
                             <div className="text-right">
@@ -361,35 +387,74 @@ export default function LiveRecoveryMonitor() {
 
                 {/* Real Log Output */}
                 <div className="flex-1 flex flex-col overflow-hidden min-h-0">
-                    <div className="text-[9px] text-[var(--text-dim)] mb-2 flex items-center gap-2 font-mono">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--neon-cyan)] animate-pulse" />
-                        ACTIVITY LOG
+                    <div className="text-[9px] text-[var(--text-dim)] mb-2 flex items-center justify-between font-mono">
+                        <div className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--neon-cyan)] animate-pulse" />
+                            ACTIVITY LOG
+                        </div>
+                        <span className="text-[8px]">{streamData.length} EVENTS</span>
                     </div>
-                    <div className="flex-1 overflow-y-auto no-scrollbar bg-[rgba(0,0,0,0.2)] rounded-lg p-2">
+                    <div className="flex-1 overflow-y-auto no-scrollbar bg-[rgba(0,0,0,0.3)] rounded-lg p-2 border border-[rgba(255,255,255,0.03)]">
                         <AnimatePresence initial={false}>
                             {streamData.length > 0 ? (
-                                streamData.map((log, idx) => (
-                                    <motion.div
-                                        key={log.id}
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: 10 }}
-                                        transition={{ delay: idx * 0.05 }}
-                                        className={`mb-1.5 py-1 px-2 rounded text-[10px] font-mono truncate
-                                            ${log.type === 'milestone' ? 'bg-[rgba(255,230,0,0.1)] text-[var(--neon-yellow)]' :
-                                            log.type === 'warning' ? 'bg-[rgba(255,0,100,0.1)] text-[var(--neon-magenta)]' :
-                                            log.type === 'info' ? 'bg-[rgba(0,240,255,0.1)] text-[var(--neon-cyan)]' :
-                                            'bg-[rgba(0,255,136,0.1)] text-[var(--neon-green)]'
-                                        }`}
-                                    >
-                                        {log.text}
-                                    </motion.div>
-                                ))
+                                streamData.map((log, idx) => {
+                                    const colors = {
+                                        achievement: { bg: 'rgba(255,230,0,0.1)', border: 'rgba(255,230,0,0.2)', text: '#FFE600' },
+                                        success: { bg: 'rgba(0,255,136,0.1)', border: 'rgba(0,255,136,0.2)', text: '#00FF88' },
+                                        warning: { bg: 'rgba(255,0,100,0.1)', border: 'rgba(255,0,100,0.2)', text: '#FF0064' },
+                                        info: { bg: 'rgba(0,240,255,0.1)', border: 'rgba(0,240,255,0.2)', text: '#00F0FF' }
+                                    };
+                                    const style = colors[log.type] || colors.info;
+                                    
+                                    return (
+                                        <motion.div
+                                            key={log.id}
+                                            initial={{ opacity: 0, x: -10, height: 0 }}
+                                            animate={{ opacity: 1, x: 0, height: 'auto' }}
+                                            exit={{ opacity: 0, x: 10, height: 0 }}
+                                            transition={{ delay: idx * 0.03, duration: 0.2 }}
+                                            className="mb-2 rounded-lg overflow-hidden"
+                                            style={{ 
+                                                background: style.bg,
+                                                border: `1px solid ${style.border}`
+                                            }}
+                                        >
+                                            <div className="p-2 flex items-center gap-2">
+                                                <span className="text-base flex-shrink-0">{log.icon}</span>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2">
+                                                        <span 
+                                                            className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded"
+                                                            style={{ background: `${style.text}20`, color: style.text }}
+                                                        >
+                                                            {log.substance}
+                                                        </span>
+                                                    </div>
+                                                    <div 
+                                                        className="text-[10px] font-mono mt-0.5 truncate"
+                                                        style={{ color: style.text }}
+                                                    >
+                                                        {log.action}
+                                                    </div>
+                                                </div>
+                                                <div className="text-[8px] text-[var(--text-dim)] flex-shrink-0">
+                                                    {formatTimeAgo(log.timestamp)}
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    );
+                                })
                             ) : (
-                                <div className="text-[var(--text-dim)] text-center py-6 text-[10px]">
-                                    <span className="text-lg block mb-2">📋</span>
+                                <div className="text-[var(--text-dim)] text-center py-8 text-[10px]">
+                                    <motion.span 
+                                        className="text-2xl block mb-2"
+                                        animate={{ y: [0, -5, 0] }}
+                                        transition={{ duration: 2, repeat: Infinity }}
+                                    >
+                                        📋
+                                    </motion.span>
                                     No activity logged yet.<br />
-                                    Use check-in buttons to log progress.
+                                    <span className="text-[var(--text-secondary)]">Use check-in buttons to start tracking</span>
                                 </div>
                             )}
                         </AnimatePresence>
