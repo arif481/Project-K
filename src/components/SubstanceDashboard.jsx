@@ -15,13 +15,43 @@ const SUBSTANCE_CONFIG = {
         color: '#00F0FF',
         gradient: 'linear-gradient(135deg, #00F0FF 0%, #0080FF 100%)',
         bgGlow: 'rgba(0, 240, 255, 0.15)',
-        milestones: [1, 3, 7, 14, 30, 60, 90, 180, 365],
+        milestones: [1, 2, 3, 5, 7, 14, 21, 30, 45, 60, 90, 120, 180, 270, 365],
         healthBenefits: [
-            { day: 1, benefit: 'Heart rate normalizing' },
-            { day: 3, benefit: 'Nicotine leaving system' },
-            { day: 14, benefit: 'Circulation improving' },
-            { day: 30, benefit: 'Lung function increasing' },
-            { day: 90, benefit: 'Cilia regenerating' },
+            { hour: 0.33, benefit: '20 min: Heart rate drops to normal' },
+            { hour: 2, benefit: '2 hrs: Nicotine cravings begin' },
+            { hour: 4, benefit: '4 hrs: Body craving nicotine intensely' },
+            { hour: 8, benefit: '8 hrs: Carbon monoxide drops 50%' },
+            { hour: 12, benefit: '12 hrs: Blood oxygen normalizes' },
+            { hour: 16, benefit: '16 hrs: Anxiety may peak' },
+            { hour: 20, benefit: '20 hrs: Receptor healing begins' },
+            { hour: 24, benefit: '24 hrs: Heart attack risk decreasing' },
+            { hour: 36, benefit: '36 hrs: Sense of smell returning' },
+            { hour: 48, benefit: '48 hrs: Taste & smell improving' },
+            { hour: 60, benefit: '60 hrs: Cravings starting to ease' },
+            { hour: 72, benefit: '72 hrs: Breathing becomes easier' },
+            { day: 4, benefit: '4 days: Blood circulation improving' },
+            { day: 5, benefit: '5 days: Nicotine fully cleared' },
+            { day: 6, benefit: '6 days: Irritability decreasing' },
+            { day: 7, benefit: '1 week: Sleep quality improving' },
+            { day: 10, benefit: '10 days: Gum inflammation reducing' },
+            { day: 14, benefit: '2 weeks: Circulation significantly better' },
+            { day: 17, benefit: '17 days: Cough reflex normalizing' },
+            { day: 21, benefit: '3 weeks: Brain fog clearing' },
+            { day: 25, benefit: '25 days: Energy levels rising' },
+            { day: 30, benefit: '1 month: Lung function up 30%' },
+            { day: 40, benefit: '40 days: Skin tone improving' },
+            { day: 50, benefit: '50 days: Exercise easier' },
+            { day: 60, benefit: '2 months: Cravings much weaker' },
+            { day: 75, benefit: '75 days: Anxiety normalized' },
+            { day: 90, benefit: '3 months: Cilia fully regenerated' },
+            { day: 120, benefit: '4 months: Lung capacity increasing' },
+            { day: 150, benefit: '5 months: Immune system stronger' },
+            { day: 180, benefit: '6 months: Coughing/wheezing gone' },
+            { day: 240, benefit: '8 months: Shortness of breath rare' },
+            { day: 270, benefit: '9 months: Lungs significantly healed' },
+            { day: 300, benefit: '10 months: Stroke risk dropping' },
+            { day: 330, benefit: '11 months: Cardiovascular improved' },
+            { day: 365, benefit: '1 year: Heart disease risk halved' },
         ]
     },
     cannabis: {
@@ -32,13 +62,41 @@ const SUBSTANCE_CONFIG = {
         color: '#00FF88',
         gradient: 'linear-gradient(135deg, #00FF88 0%, #00CC66 100%)',
         bgGlow: 'rgba(0, 255, 136, 0.15)',
-        milestones: [1, 3, 7, 14, 30, 60, 90, 180, 365],
+        milestones: [1, 2, 3, 5, 7, 14, 21, 30, 45, 60, 90, 120, 180, 365],
         healthBenefits: [
-            { day: 1, benefit: 'THC detox beginning' },
-            { day: 7, benefit: 'Sleep patterns improving' },
-            { day: 14, benefit: 'Memory clarity returning' },
-            { day: 30, benefit: 'Motivation increasing' },
-            { day: 90, benefit: 'Full cognitive recovery' },
+            { hour: 6, benefit: '6 hrs: Initial detox starting' },
+            { hour: 12, benefit: '12 hrs: Appetite changes begin' },
+            { hour: 18, benefit: '18 hrs: THC metabolizing' },
+            { hour: 24, benefit: '24 hrs: THC detox in progress' },
+            { hour: 36, benefit: '36 hrs: Irritability may peak' },
+            { hour: 48, benefit: '48 hrs: Withdrawal symptoms begin' },
+            { hour: 60, benefit: '60 hrs: Mood swings common' },
+            { hour: 72, benefit: '72 hrs: THC leaving fat cells' },
+            { day: 4, benefit: '4 days: Sleep disruption peaks' },
+            { day: 5, benefit: '5 days: Appetite normalizing' },
+            { day: 6, benefit: '6 days: Headaches subsiding' },
+            { day: 7, benefit: '1 week: Sleep patterns improving' },
+            { day: 8, benefit: '8 days: REM sleep returning' },
+            { day: 10, benefit: '10 days: Dreams returning vividly' },
+            { day: 12, benefit: '12 days: Concentration improving' },
+            { day: 14, benefit: '2 weeks: Short-term memory better' },
+            { day: 17, benefit: '17 days: Anxiety easing' },
+            { day: 21, benefit: '3 weeks: Motivation increasing' },
+            { day: 25, benefit: '25 days: Mood stabilizing' },
+            { day: 30, benefit: '1 month: Mental clarity returning' },
+            { day: 35, benefit: '35 days: Creativity returning' },
+            { day: 40, benefit: '40 days: Energy levels up' },
+            { day: 45, benefit: '45 days: Anxiety much lower' },
+            { day: 50, benefit: '50 days: Social confidence up' },
+            { day: 60, benefit: '2 months: Focus significantly better' },
+            { day: 75, benefit: '75 days: Memory consolidated' },
+            { day: 90, benefit: '3 months: Full cognitive recovery' },
+            { day: 120, benefit: '4 months: Emotional regulation strong' },
+            { day: 150, benefit: '5 months: Reward system healing' },
+            { day: 180, benefit: '6 months: Dopamine rebalanced' },
+            { day: 240, benefit: '8 months: New neural pathways' },
+            { day: 300, benefit: '10 months: Permanent brain changes' },
+            { day: 365, benefit: '1 year: Brain fully recovered' },
         ]
     },
     alcohol: {
@@ -49,13 +107,42 @@ const SUBSTANCE_CONFIG = {
         color: '#FF0064',
         gradient: 'linear-gradient(135deg, #FF0064 0%, #FF6B6B 100%)',
         bgGlow: 'rgba(255, 0, 100, 0.15)',
-        milestones: [1, 3, 7, 14, 30, 60, 90, 180, 365],
+        milestones: [1, 2, 3, 5, 7, 14, 21, 30, 45, 60, 90, 120, 180, 365],
         healthBenefits: [
-            { day: 1, benefit: 'Liver beginning recovery' },
-            { day: 7, benefit: 'Sleep quality improving' },
-            { day: 14, benefit: 'Skin hydration returning' },
-            { day: 30, benefit: 'Blood pressure normalizing' },
-            { day: 90, benefit: 'Liver fully regenerating' },
+            { hour: 4, benefit: '4 hrs: Blood sugar stabilizing' },
+            { hour: 8, benefit: '8 hrs: Alcohol leaving blood' },
+            { hour: 12, benefit: '12 hrs: Body starting detox' },
+            { hour: 18, benefit: '18 hrs: Withdrawal may begin' },
+            { hour: 24, benefit: '24 hrs: Liver beginning recovery' },
+            { hour: 36, benefit: '36 hrs: Symptoms may intensify' },
+            { hour: 48, benefit: '48 hrs: Withdrawal peaks' },
+            { hour: 60, benefit: '60 hrs: Worst symptoms passing' },
+            { hour: 72, benefit: '72 hrs: Body detoxing heavily' },
+            { day: 4, benefit: '4 days: Blood sugar normalizing' },
+            { day: 5, benefit: '5 days: Clearer thinking' },
+            { day: 6, benefit: '6 days: Appetite returning' },
+            { day: 7, benefit: '1 week: Sleep quality improving' },
+            { day: 8, benefit: '8 days: Hydration improving' },
+            { day: 10, benefit: '10 days: Energy levels rising' },
+            { day: 12, benefit: '12 days: Anxiety decreasing' },
+            { day: 14, benefit: '2 weeks: Skin hydration returning' },
+            { day: 17, benefit: '17 days: Bloating reduced' },
+            { day: 21, benefit: '3 weeks: Blood pressure normalizing' },
+            { day: 25, benefit: '25 days: Mental clarity up' },
+            { day: 30, benefit: '1 month: Liver fat reducing' },
+            { day: 35, benefit: '35 days: Face puffiness gone' },
+            { day: 40, benefit: '40 days: Better mood overall' },
+            { day: 45, benefit: '45 days: Immune system stronger' },
+            { day: 50, benefit: '50 days: Weight normalizing' },
+            { day: 60, benefit: '2 months: Digestive system healing' },
+            { day: 75, benefit: '75 days: Liver enzymes normal' },
+            { day: 90, benefit: '3 months: Liver significantly healed' },
+            { day: 120, benefit: '4 months: Cognitive function improved' },
+            { day: 150, benefit: '5 months: Heart health improving' },
+            { day: 180, benefit: '6 months: Cancer risk decreasing' },
+            { day: 240, benefit: '8 months: Metabolism normalized' },
+            { day: 300, benefit: '10 months: Nerve damage reversing' },
+            { day: 365, benefit: '1 year: Brain fully recovered' },
         ]
     }
 };
@@ -204,8 +291,14 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
     // Get current health benefit
     const getCurrentBenefit = useCallback(() => {
         const benefits = config.healthBenefits;
+        // Calculate total hours since quit
+        const totalHours = days * 24;
+        
         for (let i = benefits.length - 1; i >= 0; i--) {
-            if (days >= benefits[i].day) return benefits[i];
+            const b = benefits[i];
+            // Check if this benefit has been achieved (using hours for precision)
+            const benefitHours = b.hour !== undefined ? b.hour : (b.day || 0) * 24;
+            if (totalHours >= benefitHours) return b;
         }
         return benefits[0];
     }, [days, config]);
@@ -378,19 +471,32 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
                                 exit={{ height: 0, opacity: 0 }}
                                 className="overflow-hidden"
                             >
-                                <div className="py-3 space-y-2 border-b border-[var(--border-dim)]">
-                                    {config.healthBenefits.map((b, i) => (
-                                        <div 
-                                            key={i} 
-                                            className={`flex items-center gap-2 text-[10px] ${days >= b.day ? 'opacity-100' : 'opacity-40'}`}
-                                        >
-                                            <span style={{ color: days >= b.day ? config.color : 'var(--text-dim)' }}>
-                                                {days >= b.day ? '✓' : '○'}
-                                            </span>
-                                            <span className="text-[var(--text-dim)]">Day {b.day}:</span>
-                                            <span className="text-white">{b.benefit}</span>
-                                        </div>
-                                    ))}
+                                <div className="py-3 space-y-2 border-b border-[var(--border-dim)] max-h-[300px] overflow-y-auto scrollbar-thin">
+                                    {config.healthBenefits.map((b, i) => {
+                                        // Calculate if this benefit has been achieved
+                                        // For hour-based benefits, convert to days
+                                        const benefitDays = b.hour ? b.hour / 24 : (b.day || 0);
+                                        const achieved = days >= benefitDays;
+                                        
+                                        return (
+                                            <motion.div 
+                                                key={i}
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: i * 0.03 }}
+                                                className={`flex items-start gap-2 text-[10px] py-1 px-2 rounded-md transition-all
+                                                    ${achieved ? 'bg-[rgba(0,255,136,0.05)]' : 'opacity-50'}`}
+                                            >
+                                                <span 
+                                                    className="mt-0.5 text-xs"
+                                                    style={{ color: achieved ? config.color : 'var(--text-dim)' }}
+                                                >
+                                                    {achieved ? '✓' : '○'}
+                                                </span>
+                                                <span className="text-white leading-relaxed">{b.benefit}</span>
+                                            </motion.div>
+                                        );
+                                    })}
                                 </div>
                             </motion.div>
                         )}

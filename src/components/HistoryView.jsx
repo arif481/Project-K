@@ -211,6 +211,7 @@ export default function HistoryView() {
     const [searchTerm, setSearchTerm] = useState('');
     const [confirmDelete, setConfirmDelete] = useState(null);
     const searchRef = useRef(null);
+    const deleteTimeoutRef = useRef(null);
 
     const filteredEntries = useMemo(() => {
         return entries
@@ -231,9 +232,16 @@ export default function HistoryView() {
         if (confirmDelete === id) {
             removeEntry(id);
             setConfirmDelete(null);
+            if (deleteTimeoutRef.current) {
+                clearTimeout(deleteTimeoutRef.current);
+                deleteTimeoutRef.current = null;
+            }
         } else {
             setConfirmDelete(id);
-            setTimeout(() => setConfirmDelete(null), 3000);
+            if (deleteTimeoutRef.current) {
+                clearTimeout(deleteTimeoutRef.current);
+            }
+            deleteTimeoutRef.current = setTimeout(() => setConfirmDelete(null), 3000);
         }
     };
 

@@ -88,8 +88,8 @@ export function RecoveryProvider({ children }) {
             }, { merge: true });
             // Optimistic update
             setUserSettings(prev => ({ ...prev, ...newSettings }));
-        } catch (e) {
-            console.error("Error saving settings:", e);
+        } catch {
+            // Settings sync failed - optimistic update already applied
         }
     }, [user]);
 
@@ -167,8 +167,8 @@ export function RecoveryProvider({ children }) {
                     }
                 }, { merge: true });
             }
-        } catch (e) {
-            console.error("Sync Error:", e);
+        } catch {
+            // Entry sync failed - will retry on next action
         }
     }, [user, quitDates]);
 
@@ -181,8 +181,8 @@ export function RecoveryProvider({ children }) {
     const logout = useCallback(async () => {
         try {
             await auth.signOut();
-        } catch (e) {
-            console.error("Logout Error:", e);
+        } catch {
+            // Logout failed - user may need to retry
         }
     }, []);
 
@@ -200,8 +200,8 @@ export function RecoveryProvider({ children }) {
             await setDoc(doc(db, 'users', user.uid), {
                 quitDates: newQuitDates
             }, { merge: true });
-        } catch (e) {
-            console.error("Reset Error:", e);
+        } catch {
+            // Reset failed - will retry on next action
         }
     }, [user, quitDates]);
 

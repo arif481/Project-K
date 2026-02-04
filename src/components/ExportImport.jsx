@@ -1,26 +1,45 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRecovery } from '../context/RecoveryContext';
 
 export default function ExportImport() {
-    const { entries, quitDates, loadData } = useRecovery();
+    const { entries, quitDates, userSettings } = useRecovery();
     const [status, setStatus] = useState('');
+    const statusTimeoutRef = useRef(null);
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (statusTimeoutRef.current) {
+                clearTimeout(statusTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    const setStatusWithTimeout = (message) => {
+        setStatus(message);
+        if (statusTimeoutRef.current) {
+            clearTimeout(statusTimeoutRef.current);
+        }
+        statusTimeoutRef.current = setTimeout(() => setStatus(''), 3000);
+    };
 
     const handleExport = () => {
         const data = {
             entries,
             quitDates,
+            settings: userSettings,
             exportedAt: new Date().toISOString(),
-            version: '2.0-premium'
+            version: '4.0'
         };
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `recovery_data_backup_${new Date().toISOString().split('T')[0]}.json`;
+        link.download = `recovery_backup_${new Date().toISOString().split('T')[0]}.json`;
         link.click();
-        setStatus('Protocol: Export Successful');
-        setTimeout(() => setStatus(''), 3000);
+        URL.revokeObjectURL(url); // Clean up URL object
+        setStatusWithTimeout('Protocol: Export Successful');
     };
 
     const handleImport = (e) => {
@@ -32,19 +51,19 @@ export default function ExportImport() {
             try {
                 const data = JSON.parse(event.target.result);
                 if (data.entries && data.quitDates) {
-                    localStorage.setItem('recovery_entries', JSON.stringify(data.entries));
-                    localStorage.setItem('recovery_quit_dates', JSON.stringify(data.quitDates));
-                    loadData(); // Reload context
-                    setStatus('Protocol: Data Restoration Complete');
+                    // Note: Import to Firebase requires re-authentication flow
+                    // For now, show info about cloud sync
+                    setStatusWithTimeout('Info: Data is synced via Firebase. Manual import disabled.');
                 } else {
-                    setStatus('Error: Integrity Check Failed');
+                    setStatusWithTimeout('Error: Integrity Check Failed');
                 }
-            } catch (err) {
-                setStatus('Error: Archive Corruption Detected');
+            } catch {
+                setStatusWithTimeout('Error: Archive Corruption Detected');
             }
-            setTimeout(() => setStatus(''), 3000);
         };
         reader.readAsText(file);
+        // Reset file input
+        e.target.value = '';
     };
 
     return (

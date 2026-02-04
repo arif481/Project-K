@@ -1,7 +1,6 @@
 import { useRef, useMemo, Suspense, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Float, Stars, MeshDistortMaterial } from '@react-three/drei';
-import * as THREE from 'three';
 
 // ==========================================
 // DYNAMIC NEURAL NETWORK MESH
