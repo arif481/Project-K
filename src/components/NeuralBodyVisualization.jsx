@@ -1,8 +1,8 @@
-// NeuralBodyVisualization.jsx - Futuristic 3D Human Body with Neural Pathways v5.0
-// Real-time damage visualization based on user data - HOLOGRAPHIC STYLE
+// NeuralBodyVisualization.jsx - Iron Man Style Holographic Body v6.0
+// Real-time damage visualization based on user data - WIREFRAME MESH STYLE
 import { useRef, useMemo, useState, useEffect, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, Html, OrbitControls, Line } from '@react-three/drei';
+import { Float, Html, OrbitControls, Line, MeshTransmissionMaterial } from '@react-three/drei';
 import { motion } from 'framer-motion';
 import { useRecovery } from '../context/RecoveryContext';
 import * as THREE from 'three';
@@ -99,183 +99,203 @@ const NEURAL_PATHWAYS = [
 ];
 
 // ==========================================
-// HOLOGRAPHIC HUMAN BODY SILHOUETTE
+// HOLOGRAPHIC WIREFRAME HUMAN BODY - IRON MAN STYLE
 // ==========================================
-function HumanBodyHologram({ overallHealth }) {
-    const groupRef = useRef();
-    const scanLineRef = useRef();
-    const gridRef = useRef();
+function HolographicBody({ overallHealth }) {
+    const bodyRef = useRef();
+    const innerGlowRef = useRef();
+    const pulseRef = useRef();
+    const scanRef = useRef();
     
     const healthColor = useMemo(() => {
-        if (overallHealth > 70) return '#00FF88';
+        if (overallHealth > 70) return '#00F0FF';
         if (overallHealth > 40) return '#FFE600';
+        return '#FF0044';
+    }, [overallHealth]);
+    
+    const secondaryColor = useMemo(() => {
+        if (overallHealth > 70) return '#00FF88';
+        if (overallHealth > 40) return '#FF8800';
         return '#FF0044';
     }, [overallHealth]);
     
     useFrame((state) => {
         const t = state.clock.elapsedTime;
         
-        // Subtle body sway
-        if (groupRef.current) {
-            groupRef.current.rotation.y = Math.sin(t * 0.3) * 0.05;
+        if (bodyRef.current) {
+            bodyRef.current.rotation.y = Math.sin(t * 0.2) * 0.08;
         }
         
-        // Scanning line animation
-        if (scanLineRef.current) {
-            scanLineRef.current.position.y = ((t * 0.4) % 2.4) - 0.2;
+        if (innerGlowRef.current) {
+            innerGlowRef.current.material.opacity = 0.08 + Math.sin(t * 1.5) * 0.04;
         }
         
-        // Grid pulse
-        if (gridRef.current) {
-            gridRef.current.material.opacity = 0.08 + Math.sin(t * 2) * 0.04;
+        if (pulseRef.current) {
+            const scale = 1 + Math.sin(t * 2) * 0.02;
+            pulseRef.current.scale.set(scale, scale, scale);
+        }
+        
+        if (scanRef.current) {
+            scanRef.current.position.y = ((t * 0.5) % 3.8) - 1.7;
         }
     });
     
-    // Create anatomically correct body outline
-    const bodyOutline = useMemo(() => {
-        const points = [];
-        
-        // Right side of body silhouette
-        const rightSide = [
-            // Head top
-            [0, 1.95, 0], [0.08, 1.92, 0], [0.12, 1.85, 0], [0.14, 1.75, 0], 
-            [0.13, 1.65, 0], [0.12, 1.58, 0],
-            // Neck
-            [0.06, 1.52, 0], [0.06, 1.42, 0],
-            // Shoulder
-            [0.22, 1.38, 0], [0.32, 1.32, 0], [0.38, 1.25, 0],
-            // Upper arm
-            [0.42, 1.1, 0], [0.44, 0.95, 0], [0.42, 0.8, 0],
-            // Elbow & forearm  
-            [0.44, 0.65, 0], [0.42, 0.5, 0], [0.38, 0.35, 0], [0.35, 0.2, 0],
-            // Hand
-            [0.32, 0.1, 0], [0.28, 0.02, 0],
-        ];
-        
-        const torsoRight = [
-            // Back to shoulder
-            [0.25, 1.32, 0],
-            // Torso
-            [0.22, 1.2, 0], [0.2, 1.0, 0], [0.22, 0.8, 0], [0.2, 0.6, 0],
-            // Hip
-            [0.22, 0.4, 0], [0.2, 0.25, 0], [0.22, 0.15, 0],
-            // Upper leg
-            [0.18, 0, 0], [0.16, -0.2, 0], [0.14, -0.45, 0],
-            // Knee
-            [0.13, -0.6, 0], [0.14, -0.75, 0],
-            // Lower leg
-            [0.12, -0.95, 0], [0.11, -1.15, 0], [0.1, -1.35, 0],
-            // Ankle & foot
-            [0.12, -1.45, 0], [0.16, -1.5, 0], [0.08, -1.52, 0],
-        ];
-        
-        // Left side (mirror)
-        const leftSide = [...rightSide].reverse().map(p => [-p[0], p[1], p[2]]);
-        const torsoLeft = [...torsoRight].reverse().map(p => [-p[0], p[1], p[2]]);
-        
-        return [...rightSide, ...leftSide.slice(1), [0, 1.95, 0]];
-    }, []);
-    
-    const spinePoints = useMemo(() => [
-        [0, 1.52, 0], [0, 1.3, 0], [0, 1.0, 0], [0, 0.7, 0], 
-        [0, 0.4, 0], [0, 0.15, 0]
-    ], []);
-    
-    const ribPoints = useMemo(() => {
-        const ribs = [];
-        const ribHeights = [1.15, 1.0, 0.85, 0.7];
-        ribHeights.forEach(y => {
-            ribs.push([[-0.18, y, 0], [0, y - 0.05, 0], [0.18, y, 0]]);
-        });
-        return ribs;
-    }, []);
-
     return (
-        <group ref={groupRef}>
-            {/* Holographic Grid Background */}
-            <mesh ref={gridRef} position={[0, 0.2, -0.4]} rotation={[0, 0, 0]}>
-                <planeGeometry args={[1.8, 3.8, 18, 38]} />
-                <meshBasicMaterial 
-                    color={healthColor}
-                    wireframe
-                    transparent
-                    opacity={0.08}
-                    side={THREE.DoubleSide}
-                />
+        <group ref={bodyRef}>
+            {/* ===== HEAD ===== */}
+            <group position={[0, 1.7, 0]}>
+                {/* Skull wireframe */}
+                <mesh>
+                    <sphereGeometry args={[0.2, 16, 12]} />
+                    <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.6} />
+                </mesh>
+                {/* Inner glow */}
+                <mesh>
+                    <sphereGeometry args={[0.18, 12, 8]} />
+                    <meshBasicMaterial color={healthColor} transparent opacity={0.15} />
+                </mesh>
+                {/* Face plate */}
+                <mesh position={[0, -0.02, 0.12]}>
+                    <planeGeometry args={[0.18, 0.22]} />
+                    <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.4} />
+                </mesh>
+            </group>
+            
+            {/* ===== NECK ===== */}
+            <mesh position={[0, 1.48, 0]}>
+                <cylinderGeometry args={[0.06, 0.08, 0.15, 8]} />
+                <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.5} />
             </mesh>
             
-            {/* Body Outline - Primary glow */}
-            <Line
-                points={bodyOutline}
-                color={healthColor}
-                lineWidth={2.5}
-                transparent
-                opacity={0.9}
-            />
+            {/* ===== TORSO - RIBCAGE ===== */}
+            <group position={[0, 1.05, 0]}>
+                {/* Main torso cage */}
+                <mesh ref={pulseRef}>
+                    <cylinderGeometry args={[0.22, 0.28, 0.7, 12, 4, true]} />
+                    <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.55} />
+                </mesh>
+                {/* Inner chest glow */}
+                <mesh ref={innerGlowRef}>
+                    <cylinderGeometry args={[0.18, 0.24, 0.65, 8]} />
+                    <meshBasicMaterial color={secondaryColor} transparent opacity={0.1} />
+                </mesh>
+                {/* Spine detail */}
+                <mesh position={[0, 0, -0.2]}>
+                    <boxGeometry args={[0.04, 0.65, 0.04]} />
+                    <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.4} />
+                </mesh>
+                {/* Horizontal rib lines */}
+                {[-0.25, -0.1, 0.05, 0.2].map((y, i) => (
+                    <mesh key={i} position={[0, y, 0.1]} rotation={[0.2, 0, 0]}>
+                        <torusGeometry args={[0.2 - i * 0.02, 0.008, 4, 16, Math.PI]} />
+                        <meshBasicMaterial color={healthColor} transparent opacity={0.35} />
+                    </mesh>
+                ))}
+            </group>
             
-            {/* Body Outline - Outer glow effect */}
-            <Line
-                points={bodyOutline}
-                color={healthColor}
-                lineWidth={8}
-                transparent
-                opacity={0.15}
-            />
+            {/* ===== ABDOMEN ===== */}
+            <group position={[0, 0.5, 0]}>
+                <mesh>
+                    <cylinderGeometry args={[0.28, 0.22, 0.4, 10, 2, true]} />
+                    <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.45} />
+                </mesh>
+                {/* Pelvis */}
+                <mesh position={[0, -0.25, 0]}>
+                    <cylinderGeometry args={[0.22, 0.25, 0.15, 8]} />
+                    <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.4} />
+                </mesh>
+            </group>
             
-            {/* Spine line */}
-            <Line
-                points={spinePoints}
-                color={healthColor}
-                lineWidth={1.5}
-                transparent
-                opacity={0.5}
-            />
-            
-            {/* Rib cage */}
-            {ribPoints.map((rib, i) => (
-                <Line
-                    key={i}
-                    points={rib}
-                    color={healthColor}
-                    lineWidth={1}
-                    transparent
-                    opacity={0.3}
-                />
+            {/* ===== SHOULDERS ===== */}
+            {[-1, 1].map((side) => (
+                <group key={side} position={[side * 0.32, 1.32, 0]}>
+                    <mesh>
+                        <sphereGeometry args={[0.08, 8, 6]} />
+                        <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.5} />
+                    </mesh>
+                </group>
             ))}
             
-            {/* Horizontal scan line */}
-            <mesh ref={scanLineRef} position={[0, 1, 0]}>
-                <planeGeometry args={[1.2, 0.015]} />
-                <meshBasicMaterial 
-                    color="#00F0FF"
-                    transparent
-                    opacity={0.9}
-                    side={THREE.DoubleSide}
-                />
+            {/* ===== ARMS ===== */}
+            {[-1, 1].map((side) => (
+                <group key={side}>
+                    {/* Upper arm */}
+                    <mesh position={[side * 0.38, 1.1, 0]} rotation={[0, 0, side * 0.15]}>
+                        <cylinderGeometry args={[0.05, 0.06, 0.4, 8]} />
+                        <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.45} />
+                    </mesh>
+                    {/* Elbow joint */}
+                    <mesh position={[side * 0.42, 0.85, 0]}>
+                        <sphereGeometry args={[0.045, 6, 4]} />
+                        <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.4} />
+                    </mesh>
+                    {/* Forearm */}
+                    <mesh position={[side * 0.44, 0.6, 0]} rotation={[0, 0, side * 0.1]}>
+                        <cylinderGeometry args={[0.035, 0.05, 0.4, 6]} />
+                        <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.4} />
+                    </mesh>
+                    {/* Hand */}
+                    <mesh position={[side * 0.45, 0.35, 0]}>
+                        <boxGeometry args={[0.06, 0.1, 0.03]} />
+                        <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.35} />
+                    </mesh>
+                </group>
+            ))}
+            
+            {/* ===== LEGS ===== */}
+            {[-1, 1].map((side) => (
+                <group key={side}>
+                    {/* Hip joint */}
+                    <mesh position={[side * 0.12, 0.18, 0]}>
+                        <sphereGeometry args={[0.06, 6, 4]} />
+                        <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.4} />
+                    </mesh>
+                    {/* Upper leg */}
+                    <mesh position={[side * 0.14, -0.15, 0]}>
+                        <cylinderGeometry args={[0.06, 0.08, 0.55, 8]} />
+                        <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.45} />
+                    </mesh>
+                    {/* Knee joint */}
+                    <mesh position={[side * 0.14, -0.48, 0]}>
+                        <sphereGeometry args={[0.055, 6, 4]} />
+                        <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.4} />
+                    </mesh>
+                    {/* Lower leg */}
+                    <mesh position={[side * 0.13, -0.85, 0]}>
+                        <cylinderGeometry args={[0.04, 0.055, 0.6, 6]} />
+                        <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.4} />
+                    </mesh>
+                    {/* Foot */}
+                    <mesh position={[side * 0.13, -1.2, 0.04]}>
+                        <boxGeometry args={[0.07, 0.06, 0.15]} />
+                        <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.35} />
+                    </mesh>
+                </group>
+            ))}
+            
+            {/* ===== SCANNING EFFECT ===== */}
+            <mesh ref={scanRef} position={[0, 0, 0.1]}>
+                <planeGeometry args={[1.2, 0.02]} />
+                <meshBasicMaterial color="#00F0FF" transparent opacity={0.9} side={THREE.DoubleSide} />
+            </mesh>
+            <mesh ref={scanRef} position={[0, 0, 0.1]}>
+                <planeGeometry args={[1.3, 0.1]} />
+                <meshBasicMaterial color="#00F0FF" transparent opacity={0.15} side={THREE.DoubleSide} />
             </mesh>
             
-            {/* Scan line glow */}
-            <mesh ref={scanLineRef} position={[0, 1, 0]}>
-                <planeGeometry args={[1.3, 0.08]} />
-                <meshBasicMaterial 
-                    color="#00F0FF"
-                    transparent
-                    opacity={0.15}
-                    side={THREE.DoubleSide}
-                />
+            {/* ===== ENERGY FIELD / AURA ===== */}
+            <mesh>
+                <cylinderGeometry args={[0.5, 0.4, 3, 16, 8, true]} />
+                <meshBasicMaterial color={healthColor} wireframe transparent opacity={0.08} />
             </mesh>
             
-            {/* Head circle indicator */}
-            <mesh position={[0, 1.75, 0]} rotation={[0, 0, 0]}>
-                <ringGeometry args={[0.16, 0.18, 32]} />
-                <meshBasicMaterial color={healthColor} transparent opacity={0.4} side={THREE.DoubleSide} />
-            </mesh>
-            
-            {/* Heart region indicator */}
-            <mesh position={[0.08, 0.85, 0.1]} rotation={[0, 0, 0]}>
-                <ringGeometry args={[0.08, 0.1, 32]} />
-                <meshBasicMaterial color={healthColor} transparent opacity={0.3} side={THREE.DoubleSide} />
-            </mesh>
+            {/* ===== CIRCULAR DATA RINGS ===== */}
+            {[1.8, 1.0, 0.2, -0.6].map((y, i) => (
+                <mesh key={i} position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                    <ringGeometry args={[0.4 + i * 0.05, 0.42 + i * 0.05, 32]} />
+                    <meshBasicMaterial color={healthColor} transparent opacity={0.15 - i * 0.02} side={THREE.DoubleSide} />
+                </mesh>
+            ))}
         </group>
     );
 }
@@ -558,15 +578,16 @@ function BodyScene({ organHealth, overallHealth, hoveredOrgan, selectedOrgan, se
     return (
         <>
             {/* Lighting */}
-            <ambientLight intensity={0.2} />
-            <pointLight position={[3, 3, 3]} intensity={0.6} color="#00F0FF" />
-            <pointLight position={[-3, 2, -2]} intensity={0.4} color="#FF00FF" />
-            <pointLight position={[0, -2, 2]} intensity={0.3} color="#00FF88" />
+            <ambientLight intensity={0.15} />
+            <pointLight position={[3, 3, 3]} intensity={0.8} color="#00F0FF" />
+            <pointLight position={[-3, 2, -2]} intensity={0.5} color="#00F0FF" />
+            <pointLight position={[0, -2, 2]} intensity={0.4} color="#00FF88" />
+            <spotLight position={[0, 5, 5]} intensity={0.3} color="#FFFFFF" angle={0.5} />
             
-            <Float speed={0.5} rotationIntensity={0.03} floatIntensity={0.08}>
-                <group scale={1.2} position={[0, -0.2, 0]}>
-                    {/* Human Body Hologram */}
-                    <HumanBodyHologram overallHealth={overallHealth} />
+            <Float speed={0.3} rotationIntensity={0.02} floatIntensity={0.05}>
+                <group scale={1.15} position={[0, -0.25, 0]}>
+                    {/* Holographic Wireframe Body */}
+                    <HolographicBody overallHealth={overallHealth} />
                     
                     {/* Organ Nodes */}
                     {Object.entries(ORGAN_SYSTEMS).map(([id, data]) => (
@@ -595,17 +616,17 @@ function BodyScene({ organHealth, overallHealth, hoveredOrgan, selectedOrgan, se
                     })}
                     
                     {/* Floating Particles */}
-                    <FloatingParticles count={60} overallHealth={overallHealth} />
+                    <FloatingParticles count={80} overallHealth={overallHealth} />
                 </group>
             </Float>
             
             <OrbitControls
                 enablePan={false}
                 enableZoom={true}
-                minDistance={2}
-                maxDistance={5}
+                minDistance={2.5}
+                maxDistance={6}
                 autoRotate
-                autoRotateSpeed={0.25}
+                autoRotateSpeed={0.3}
                 maxPolarAngle={Math.PI * 0.75}
                 minPolarAngle={Math.PI * 0.25}
             />
