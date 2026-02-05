@@ -1,216 +1,437 @@
-// NeuralBodyVisualization.jsx - 3D Human Body with Neural Pathways v4.0
-// Real-time damage visualization based on user data
-import { useRef, useMemo, useState, useEffect, Suspense, useCallback } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Float, Html, OrbitControls } from '@react-three/drei';
-import { motion, AnimatePresence } from 'framer-motion';
+// NeuralBodyVisualization.jsx - Futuristic 3D Human Body with Neural Pathways v5.0
+// Real-time damage visualization based on user data - HOLOGRAPHIC STYLE
+import { useRef, useMemo, useState, useEffect, Suspense } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Float, Html, OrbitControls, Line } from '@react-three/drei';
+import { motion } from 'framer-motion';
 import { useRecovery } from '../context/RecoveryContext';
-import { HudCard } from './HudComponents';
+import * as THREE from 'three';
 
 // ==========================================
-// BODY ORGAN SYSTEM DEFINITIONS
+// ORGAN SYSTEM DEFINITIONS - ANATOMICAL POSITIONS
 // ==========================================
 const ORGAN_SYSTEMS = {
     brain: {
-        name: 'NEURAL CORTEX',
-        position: [0, 2.2, 0],
-        size: 0.35,
+        name: 'BRAIN',
+        displayName: 'Neural Cortex',
+        position: [0, 1.65, 0.05],
+        icon: '🧠',
         affectedBy: { cigarettes: 0.7, cannabis: 0.9, alcohol: 0.8 },
         recoveryDays: { cigarettes: 90, cannabis: 180, alcohol: 365 },
-        description: 'Cognitive function, memory, decision-making',
-        color: '#FF00FF'
-    },
-    prefrontalCortex: {
-        name: 'PREFRONTAL CORTEX',
-        position: [0, 2.35, 0.2],
-        size: 0.2,
-        affectedBy: { cigarettes: 0.5, cannabis: 0.95, alcohol: 0.85 },
-        recoveryDays: { cigarettes: 60, cannabis: 180, alcohol: 270 },
-        description: 'Impulse control, planning, judgment',
-        color: '#FF44FF'
+        description: 'Cognitive function & memory'
     },
     heart: {
-        name: 'CARDIAC SYSTEM',
-        position: [0.1, 0.8, 0.15],
-        size: 0.25,
+        name: 'HEART',
+        displayName: 'Cardiac System',
+        position: [0.08, 0.85, 0.12],
+        icon: '❤️',
         affectedBy: { cigarettes: 0.95, cannabis: 0.3, alcohol: 0.7 },
         recoveryDays: { cigarettes: 365, cannabis: 30, alcohol: 180 },
-        description: 'Cardiovascular health, blood pressure',
-        color: '#FF0044'
+        description: 'Cardiovascular health'
     },
     lungs: {
-        name: 'PULMONARY SYSTEM',
-        position: [0, 0.6, 0],
-        size: 0.4,
+        name: 'LUNGS',
+        displayName: 'Pulmonary System',
+        position: [0, 0.75, 0.08],
+        icon: '🫁',
         affectedBy: { cigarettes: 1.0, cannabis: 0.8, alcohol: 0.2 },
         recoveryDays: { cigarettes: 270, cannabis: 90, alcohol: 30 },
-        description: 'Respiratory capacity, oxygen absorption',
-        color: '#00AAFF'
+        description: 'Respiratory capacity'
     },
     liver: {
-        name: 'HEPATIC SYSTEM',
-        position: [0.25, 0.2, 0.1],
-        size: 0.28,
+        name: 'LIVER',
+        displayName: 'Hepatic System',
+        position: [0.12, 0.45, 0.1],
+        icon: '🫀',
         affectedBy: { cigarettes: 0.4, cannabis: 0.3, alcohol: 1.0 },
         recoveryDays: { cigarettes: 60, cannabis: 30, alcohol: 365 },
-        description: 'Toxin filtration, metabolism',
-        color: '#884400'
+        description: 'Toxin filtration'
     },
     kidneys: {
-        name: 'RENAL SYSTEM',
-        position: [0, -0.1, -0.15],
-        size: 0.18,
+        name: 'KIDNEYS',
+        displayName: 'Renal System',
+        position: [0, 0.25, -0.05],
+        icon: '🫘',
         affectedBy: { cigarettes: 0.5, cannabis: 0.2, alcohol: 0.6 },
         recoveryDays: { cigarettes: 90, cannabis: 30, alcohol: 180 },
-        description: 'Blood filtration, toxin elimination',
-        color: '#AA4444'
+        description: 'Blood filtration'
     },
     stomach: {
-        name: 'DIGESTIVE SYSTEM',
-        position: [-0.1, 0.1, 0.12],
-        size: 0.22,
+        name: 'STOMACH',
+        displayName: 'Digestive System',
+        position: [-0.08, 0.4, 0.1],
+        icon: '🔶',
         affectedBy: { cigarettes: 0.6, cannabis: 0.4, alcohol: 0.85 },
         recoveryDays: { cigarettes: 60, cannabis: 14, alcohol: 90 },
-        description: 'Digestion, nutrient absorption',
-        color: '#FFAA00'
+        description: 'Nutrient absorption'
     },
-    spine: {
-        name: 'CENTRAL NERVOUS SYSTEM',
-        position: [0, 0.5, -0.2],
-        size: 0.15,
-        affectedBy: { cigarettes: 0.3, cannabis: 0.6, alcohol: 0.5 },
+    nervous: {
+        name: 'NERVOUS',
+        displayName: 'Central Nervous System',
+        position: [0, 0.5, -0.12],
+        icon: '⚡',
+        affectedBy: { cigarettes: 0.5, cannabis: 0.7, alcohol: 0.6 },
         recoveryDays: { cigarettes: 90, cannabis: 120, alcohol: 180 },
-        description: 'Neural signal transmission',
-        color: '#00FF88'
+        description: 'Neural signal transmission'
     },
-    bloodVessels: {
-        name: 'VASCULAR SYSTEM',
-        position: [0, 0.5, 0],
-        size: 0.5,
-        affectedBy: { cigarettes: 0.9, cannabis: 0.4, alcohol: 0.7 },
-        recoveryDays: { cigarettes: 180, cannabis: 30, alcohol: 120 },
-        description: 'Blood circulation, vessel elasticity',
-        color: '#FF3366'
-    },
-    immuneSystem: {
-        name: 'IMMUNE SYSTEM',
-        position: [0, 0.4, 0],
-        size: 0.45,
+    immune: {
+        name: 'IMMUNE',
+        displayName: 'Immune System',
+        position: [0, 0.6, 0],
+        icon: '🛡️',
         affectedBy: { cigarettes: 0.7, cannabis: 0.5, alcohol: 0.8 },
         recoveryDays: { cigarettes: 90, cannabis: 45, alcohol: 90 },
-        description: 'Disease resistance, healing capacity',
-        color: '#00FFAA'
+        description: 'Disease resistance'
     }
 };
 
 // Neural pathway connections
 const NEURAL_PATHWAYS = [
-    { from: 'brain', to: 'prefrontalCortex', thickness: 3 },
-    { from: 'brain', to: 'spine', thickness: 4 },
-    { from: 'spine', to: 'heart', thickness: 2 },
-    { from: 'spine', to: 'lungs', thickness: 2 },
-    { from: 'spine', to: 'liver', thickness: 2 },
-    { from: 'spine', to: 'kidneys', thickness: 2 },
-    { from: 'spine', to: 'stomach', thickness: 2 },
-    { from: 'brain', to: 'heart', thickness: 1 },
-    { from: 'heart', to: 'lungs', thickness: 2 },
-    { from: 'liver', to: 'kidneys', thickness: 1 },
-    { from: 'heart', to: 'bloodVessels', thickness: 3 },
+    { from: 'brain', to: 'heart' },
+    { from: 'brain', to: 'lungs' },
+    { from: 'brain', to: 'liver' },
+    { from: 'brain', to: 'kidneys' },
+    { from: 'brain', to: 'stomach' },
+    { from: 'brain', to: 'nervous' },
+    { from: 'heart', to: 'lungs' },
+    { from: 'liver', to: 'kidneys' },
+    { from: 'nervous', to: 'immune' },
 ];
 
 // ==========================================
-// 3D ORGAN COMPONENT
+// HOLOGRAPHIC HUMAN BODY SILHOUETTE
 // ==========================================
-function Organ({ id, data, damageLevel, isHovered, onHover, pulsePhase }) {
-    const meshRef = useRef();
-    const glowRef = useRef();
+function HumanBodyHologram({ overallHealth }) {
+    const groupRef = useRef();
+    const scanLineRef = useRef();
+    const gridRef = useRef();
     
-    // Calculate color based on damage (red = damaged, green = healthy)
+    const healthColor = useMemo(() => {
+        if (overallHealth > 70) return '#00FF88';
+        if (overallHealth > 40) return '#FFE600';
+        return '#FF0044';
+    }, [overallHealth]);
+    
+    useFrame((state) => {
+        const t = state.clock.elapsedTime;
+        
+        // Subtle body sway
+        if (groupRef.current) {
+            groupRef.current.rotation.y = Math.sin(t * 0.3) * 0.05;
+        }
+        
+        // Scanning line animation
+        if (scanLineRef.current) {
+            scanLineRef.current.position.y = ((t * 0.4) % 2.4) - 0.2;
+        }
+        
+        // Grid pulse
+        if (gridRef.current) {
+            gridRef.current.material.opacity = 0.08 + Math.sin(t * 2) * 0.04;
+        }
+    });
+    
+    // Create anatomically correct body outline
+    const bodyOutline = useMemo(() => {
+        const points = [];
+        
+        // Right side of body silhouette
+        const rightSide = [
+            // Head top
+            [0, 1.95, 0], [0.08, 1.92, 0], [0.12, 1.85, 0], [0.14, 1.75, 0], 
+            [0.13, 1.65, 0], [0.12, 1.58, 0],
+            // Neck
+            [0.06, 1.52, 0], [0.06, 1.42, 0],
+            // Shoulder
+            [0.22, 1.38, 0], [0.32, 1.32, 0], [0.38, 1.25, 0],
+            // Upper arm
+            [0.42, 1.1, 0], [0.44, 0.95, 0], [0.42, 0.8, 0],
+            // Elbow & forearm  
+            [0.44, 0.65, 0], [0.42, 0.5, 0], [0.38, 0.35, 0], [0.35, 0.2, 0],
+            // Hand
+            [0.32, 0.1, 0], [0.28, 0.02, 0],
+        ];
+        
+        const torsoRight = [
+            // Back to shoulder
+            [0.25, 1.32, 0],
+            // Torso
+            [0.22, 1.2, 0], [0.2, 1.0, 0], [0.22, 0.8, 0], [0.2, 0.6, 0],
+            // Hip
+            [0.22, 0.4, 0], [0.2, 0.25, 0], [0.22, 0.15, 0],
+            // Upper leg
+            [0.18, 0, 0], [0.16, -0.2, 0], [0.14, -0.45, 0],
+            // Knee
+            [0.13, -0.6, 0], [0.14, -0.75, 0],
+            // Lower leg
+            [0.12, -0.95, 0], [0.11, -1.15, 0], [0.1, -1.35, 0],
+            // Ankle & foot
+            [0.12, -1.45, 0], [0.16, -1.5, 0], [0.08, -1.52, 0],
+        ];
+        
+        // Left side (mirror)
+        const leftSide = [...rightSide].reverse().map(p => [-p[0], p[1], p[2]]);
+        const torsoLeft = [...torsoRight].reverse().map(p => [-p[0], p[1], p[2]]);
+        
+        return [...rightSide, ...leftSide.slice(1), [0, 1.95, 0]];
+    }, []);
+    
+    const spinePoints = useMemo(() => [
+        [0, 1.52, 0], [0, 1.3, 0], [0, 1.0, 0], [0, 0.7, 0], 
+        [0, 0.4, 0], [0, 0.15, 0]
+    ], []);
+    
+    const ribPoints = useMemo(() => {
+        const ribs = [];
+        const ribHeights = [1.15, 1.0, 0.85, 0.7];
+        ribHeights.forEach(y => {
+            ribs.push([[-0.18, y, 0], [0, y - 0.05, 0], [0.18, y, 0]]);
+        });
+        return ribs;
+    }, []);
+
+    return (
+        <group ref={groupRef}>
+            {/* Holographic Grid Background */}
+            <mesh ref={gridRef} position={[0, 0.2, -0.4]} rotation={[0, 0, 0]}>
+                <planeGeometry args={[1.8, 3.8, 18, 38]} />
+                <meshBasicMaterial 
+                    color={healthColor}
+                    wireframe
+                    transparent
+                    opacity={0.08}
+                    side={THREE.DoubleSide}
+                />
+            </mesh>
+            
+            {/* Body Outline - Primary glow */}
+            <Line
+                points={bodyOutline}
+                color={healthColor}
+                lineWidth={2.5}
+                transparent
+                opacity={0.9}
+            />
+            
+            {/* Body Outline - Outer glow effect */}
+            <Line
+                points={bodyOutline}
+                color={healthColor}
+                lineWidth={8}
+                transparent
+                opacity={0.15}
+            />
+            
+            {/* Spine line */}
+            <Line
+                points={spinePoints}
+                color={healthColor}
+                lineWidth={1.5}
+                transparent
+                opacity={0.5}
+            />
+            
+            {/* Rib cage */}
+            {ribPoints.map((rib, i) => (
+                <Line
+                    key={i}
+                    points={rib}
+                    color={healthColor}
+                    lineWidth={1}
+                    transparent
+                    opacity={0.3}
+                />
+            ))}
+            
+            {/* Horizontal scan line */}
+            <mesh ref={scanLineRef} position={[0, 1, 0]}>
+                <planeGeometry args={[1.2, 0.015]} />
+                <meshBasicMaterial 
+                    color="#00F0FF"
+                    transparent
+                    opacity={0.9}
+                    side={THREE.DoubleSide}
+                />
+            </mesh>
+            
+            {/* Scan line glow */}
+            <mesh ref={scanLineRef} position={[0, 1, 0]}>
+                <planeGeometry args={[1.3, 0.08]} />
+                <meshBasicMaterial 
+                    color="#00F0FF"
+                    transparent
+                    opacity={0.15}
+                    side={THREE.DoubleSide}
+                />
+            </mesh>
+            
+            {/* Head circle indicator */}
+            <mesh position={[0, 1.75, 0]} rotation={[0, 0, 0]}>
+                <ringGeometry args={[0.16, 0.18, 32]} />
+                <meshBasicMaterial color={healthColor} transparent opacity={0.4} side={THREE.DoubleSide} />
+            </mesh>
+            
+            {/* Heart region indicator */}
+            <mesh position={[0.08, 0.85, 0.1]} rotation={[0, 0, 0]}>
+                <ringGeometry args={[0.08, 0.1, 32]} />
+                <meshBasicMaterial color={healthColor} transparent opacity={0.3} side={THREE.DoubleSide} />
+            </mesh>
+        </group>
+    );
+}
+
+// ==========================================
+// ORGAN NODE - FUTURISTIC INDICATOR
+// ==========================================
+function OrganNode({ id, data, damageLevel, isHovered, isSelected, onHover, onClick }) {
+    const groupRef = useRef();
+    const ringRef = useRef();
+    const pulseRef = useRef();
+    const baseY = useRef(data.position[1]);
+    
     const healthLevel = 1 - damageLevel;
+    
+    // Color based on health
     const color = useMemo(() => {
-        if (healthLevel > 0.8) return '#00FF88'; // Healthy green
-        if (healthLevel > 0.6) return '#88FF00'; // Light green
-        if (healthLevel > 0.4) return '#FFFF00'; // Yellow
-        if (healthLevel > 0.2) return '#FF8800'; // Orange
-        return '#FF0044'; // Damaged red
+        if (healthLevel > 0.8) return '#00FF88';
+        if (healthLevel > 0.6) return '#88FF00';
+        if (healthLevel > 0.4) return '#FFE600';
+        if (healthLevel > 0.2) return '#FF8800';
+        return '#FF0044';
     }, [healthLevel]);
     
     useFrame((state) => {
         const t = state.clock.elapsedTime;
-        if (meshRef.current) {
-            // Pulse effect based on damage level
-            const pulseIntensity = 0.1 + damageLevel * 0.15;
-            meshRef.current.scale.setScalar(
-                data.size * (1 + Math.sin(t * 2 + pulsePhase) * pulseIntensity)
-            );
-            
-            // Subtle rotation
-            meshRef.current.rotation.y = t * 0.2;
+        
+        if (groupRef.current) {
+            // Subtle floating
+            groupRef.current.position.y = baseY.current + Math.sin(t * 2 + data.position[0] * 5) * 0.008;
         }
-        if (glowRef.current) {
-            glowRef.current.material.opacity = 0.3 + Math.sin(t * 3) * 0.2;
+        
+        if (ringRef.current) {
+            ringRef.current.rotation.z = t * 0.5;
+        }
+        
+        if (pulseRef.current) {
+            const scale = 1 + Math.sin(t * 3) * 0.15 * (damageLevel > 0.5 ? 1 : 0.3);
+            pulseRef.current.scale.setScalar(scale);
         }
     });
     
     return (
-        <group position={data.position}>
-            {/* Main organ mesh */}
-            <mesh 
-                ref={meshRef}
-                onPointerEnter={() => onHover(id)}
-                onPointerLeave={() => onHover(null)}
-            >
-                <sphereGeometry args={[data.size, 32, 32]} />
-                <meshStandardMaterial
-                    color={color}
-                    emissive={color}
-                    emissiveIntensity={isHovered ? 0.8 : 0.4}
-                    transparent
-                    opacity={0.85}
-                    roughness={0.3}
-                    metalness={0.7}
-                />
+        <group 
+            ref={groupRef}
+            position={data.position}
+            onPointerEnter={() => onHover(id)}
+            onPointerLeave={() => onHover(null)}
+            onClick={() => onClick(id)}
+        >
+            {/* Main indicator dot */}
+            <mesh ref={pulseRef}>
+                <sphereGeometry args={[0.035, 16, 16]} />
+                <meshBasicMaterial color={color} />
             </mesh>
             
-            {/* Outer glow */}
-            <mesh ref={glowRef} scale={1.3}>
-                <sphereGeometry args={[data.size, 16, 16]} />
-                <meshBasicMaterial
-                    color={color}
-                    transparent
-                    opacity={0.2}
-                    depthWrite={false}
-                />
+            {/* Inner glow */}
+            <mesh>
+                <sphereGeometry args={[0.05, 12, 12]} />
+                <meshBasicMaterial color={color} transparent opacity={0.3} />
             </mesh>
             
-            {/* Damage indicator rings */}
-            {damageLevel > 0.3 && (
-                <mesh rotation={[Math.PI / 2, 0, 0]}>
-                    <torusGeometry args={[data.size * 1.5, 0.02, 8, 32]} />
-                    <meshBasicMaterial color="#FF0044" transparent opacity={damageLevel * 0.8} />
+            {/* Outer ring */}
+            <mesh ref={ringRef}>
+                <torusGeometry args={[0.06, 0.006, 8, 24]} />
+                <meshBasicMaterial color={color} transparent opacity={0.9} />
+            </mesh>
+            
+            {/* Health arc indicator */}
+            <mesh rotation={[Math.PI / 2, 0, 0]}>
+                <ringGeometry args={[0.075, 0.085, 32, 1, 0, Math.PI * 2 * healthLevel]} />
+                <meshBasicMaterial color={color} transparent opacity={0.7} side={THREE.DoubleSide} />
+            </mesh>
+            
+            {/* Background arc (empty part) */}
+            <mesh rotation={[Math.PI / 2, 0, 0]}>
+                <ringGeometry args={[0.075, 0.085, 32, 1, Math.PI * 2 * healthLevel, Math.PI * 2 * (1 - healthLevel)]} />
+                <meshBasicMaterial color="#FFFFFF" transparent opacity={0.1} side={THREE.DoubleSide} />
+            </mesh>
+            
+            {/* Critical warning pulse for damaged organs */}
+            {damageLevel > 0.5 && (
+                <mesh>
+                    <sphereGeometry args={[0.1, 8, 8]} />
+                    <meshBasicMaterial 
+                        color="#FF0044"
+                        transparent
+                        opacity={0.15}
+                        wireframe
+                    />
                 </mesh>
             )}
             
-            {/* Hover label */}
-            {isHovered && (
-                <Html position={[0, data.size + 0.3, 0]} center>
-                    <div className="pointer-events-none whitespace-nowrap px-3 py-2 rounded-lg 
-                                    bg-black/90 border border-white/20 backdrop-blur-xl">
-                        <div className="text-[10px] font-mono text-white/60">{data.name}</div>
-                        <div className="text-sm font-bold font-mono" style={{ color }}>
-                            {Math.round(healthLevel * 100)}% HEALTHY
+            {/* Hover/Selected state info panel */}
+            {(isHovered || isSelected) && (
+                <>
+                    {/* Connection line to label */}
+                    <Line
+                        points={[[0, 0, 0], [data.position[0] > 0 ? 0.25 : -0.25, 0.12, 0]]}
+                        color="#00F0FF"
+                        lineWidth={1}
+                        transparent
+                        opacity={0.8}
+                    />
+                    
+                    {/* Expanded selection ring */}
+                    <mesh rotation={[Math.PI / 2, 0, 0]}>
+                        <ringGeometry args={[0.1, 0.115, 6]} />
+                        <meshBasicMaterial color="#00F0FF" transparent opacity={0.7} side={THREE.DoubleSide} />
+                    </mesh>
+                    
+                    {/* Info panel */}
+                    <Html position={[data.position[0] > 0 ? 0.3 : -0.3, 0.12, 0]} center={false}>
+                        <div className="pointer-events-none whitespace-nowrap">
+                            <div 
+                                className="px-3 py-2 rounded-lg bg-black/95 border-2 backdrop-blur-xl"
+                                style={{ borderColor: color, boxShadow: `0 0 20px ${color}40` }}
+                            >
+                                <div className="flex items-center gap-2 mb-1">
+                                    <span className="text-base">{data.icon}</span>
+                                    <span className="text-[11px] font-mono font-bold text-white">{data.name}</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div 
+                                        className="text-2xl font-mono font-black"
+                                        style={{ color }}
+                                    >
+                                        {Math.round(healthLevel * 100)}%
+                                    </div>
+                                    <div className="text-[9px] font-mono text-white/50 max-w-[100px]">
+                                        {data.description}
+                                    </div>
+                                </div>
+                                {/* Mini health bar */}
+                                <div className="mt-2 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                    <div 
+                                        className="h-full rounded-full transition-all duration-500"
+                                        style={{ width: `${healthLevel * 100}%`, background: color }}
+                                    />
+                                </div>
+                                <div className="mt-1 text-[8px] font-mono text-white/30">
+                                    {healthLevel > 0.8 ? '● OPTIMAL' : healthLevel > 0.5 ? '● RECOVERING' : '● CRITICAL'}
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </Html>
+                    </Html>
+                </>
             )}
         </group>
     );
 }
 
 // ==========================================
-// NEURAL PATHWAY LINE COMPONENT
+// NEURAL PATHWAY - ANIMATED CONNECTION
 // ==========================================
-function NeuralPathway({ from, to, thickness, damageLevel, pulsePhase }) {
+function NeuralPathway({ from, to, damageLevel }) {
     const lineRef = useRef();
     const fromPos = ORGAN_SYSTEMS[from]?.position || [0, 0, 0];
     const toPos = ORGAN_SYSTEMS[to]?.position || [0, 0, 0];
@@ -218,134 +439,58 @@ function NeuralPathway({ from, to, thickness, damageLevel, pulsePhase }) {
     const healthLevel = 1 - damageLevel;
     const color = healthLevel > 0.5 ? '#00FF88' : '#FF0044';
     
-    useFrame((state) => {
-        const t = state.clock.elapsedTime;
-        if (lineRef.current) {
-            // Pulse opacity
-            lineRef.current.material.opacity = 0.3 + Math.sin(t * 4 + pulsePhase) * 0.3;
-        }
-    });
-    
-    // Create curved path points
-    const points = useMemo(() => {
-        const midPoint = [
-            (fromPos[0] + toPos[0]) / 2,
-            (fromPos[1] + toPos[1]) / 2 + 0.1,
-            (fromPos[2] + toPos[2]) / 2 + 0.1
+    // Create curved path
+    const curvePoints = useMemo(() => {
+        const mid = [
+            (fromPos[0] + toPos[0]) / 2 + (Math.random() - 0.5) * 0.08,
+            (fromPos[1] + toPos[1]) / 2,
+            (fromPos[2] + toPos[2]) / 2 + 0.04
         ];
         
-        const curvePoints = [];
-        for (let i = 0; i <= 20; i++) {
-            const t = i / 20;
-            const x = (1 - t) * (1 - t) * fromPos[0] + 2 * (1 - t) * t * midPoint[0] + t * t * toPos[0];
-            const y = (1 - t) * (1 - t) * fromPos[1] + 2 * (1 - t) * t * midPoint[1] + t * t * toPos[1];
-            const z = (1 - t) * (1 - t) * fromPos[2] + 2 * (1 - t) * t * midPoint[2] + t * t * toPos[2];
-            curvePoints.push([x, y, z]);
-        }
-        return curvePoints;
+        const curve = new THREE.QuadraticBezierCurve3(
+            new THREE.Vector3(...fromPos),
+            new THREE.Vector3(...mid),
+            new THREE.Vector3(...toPos)
+        );
+        
+        return curve.getPoints(16);
     }, [fromPos, toPos]);
     
-    return (
-        <group>
-            {points.slice(0, -1).map((point, i) => {
-                const nextPoint = points[i + 1];
-                const midX = (point[0] + nextPoint[0]) / 2;
-                const midY = (point[1] + nextPoint[1]) / 2;
-                const midZ = (point[2] + nextPoint[2]) / 2;
-                const length = Math.sqrt(
-                    Math.pow(nextPoint[0] - point[0], 2) +
-                    Math.pow(nextPoint[1] - point[1], 2) +
-                    Math.pow(nextPoint[2] - point[2], 2)
-                );
-                
-                return (
-                    <mesh
-                        key={i}
-                        ref={i === 10 ? lineRef : null}
-                        position={[midX, midY, midZ]}
-                        lookAt={nextPoint}
-                        rotation={[Math.PI / 2, 0, 0]}
-                    >
-                        <cylinderGeometry args={[0.01 * thickness, 0.01 * thickness, length, 8]} />
-                        <meshBasicMaterial
-                            color={color}
-                            transparent
-                            opacity={0.6}
-                        />
-                    </mesh>
-                );
-            })}
-        </group>
-    );
-}
-
-// ==========================================
-// HUMAN BODY OUTLINE
-// ==========================================
-function HumanBodyOutline({ overallHealth }) {
-    const bodyRef = useRef();
-    const color = overallHealth > 70 ? '#00FF88' : overallHealth > 40 ? '#FFFF00' : '#FF0044';
-    
     useFrame((state) => {
-        const t = state.clock.elapsedTime;
-        if (bodyRef.current) {
-            bodyRef.current.rotation.y = Math.sin(t * 0.3) * 0.1;
+        if (lineRef.current) {
+            lineRef.current.material.dashOffset = -state.clock.elapsedTime * 0.3;
         }
     });
     
     return (
-        <group ref={bodyRef}>
-            {/* Head */}
-            <mesh position={[0, 2.2, 0]}>
-                <sphereGeometry args={[0.25, 32, 32]} />
-                <meshStandardMaterial color={color} transparent opacity={0.15} wireframe />
-            </mesh>
-            
-            {/* Torso */}
-            <mesh position={[0, 0.8, 0]}>
-                <cylinderGeometry args={[0.35, 0.45, 1.4, 32]} />
-                <meshStandardMaterial color={color} transparent opacity={0.1} wireframe />
-            </mesh>
-            
-            {/* Pelvis */}
-            <mesh position={[0, -0.2, 0]}>
-                <cylinderGeometry args={[0.45, 0.35, 0.4, 32]} />
-                <meshStandardMaterial color={color} transparent opacity={0.1} wireframe />
-            </mesh>
-            
-            {/* Neck */}
-            <mesh position={[0, 1.7, 0]}>
-                <cylinderGeometry args={[0.12, 0.15, 0.3, 16]} />
-                <meshStandardMaterial color={color} transparent opacity={0.1} wireframe />
-            </mesh>
-            
-            {/* Arms */}
-            <mesh position={[0.55, 0.9, 0]} rotation={[0, 0, -0.3]}>
-                <cylinderGeometry args={[0.08, 0.1, 0.8, 16]} />
-                <meshStandardMaterial color={color} transparent opacity={0.1} wireframe />
-            </mesh>
-            <mesh position={[-0.55, 0.9, 0]} rotation={[0, 0, 0.3]}>
-                <cylinderGeometry args={[0.08, 0.1, 0.8, 16]} />
-                <meshStandardMaterial color={color} transparent opacity={0.1} wireframe />
-            </mesh>
-            
-            {/* Legs */}
-            <mesh position={[0.2, -0.9, 0]}>
-                <cylinderGeometry args={[0.12, 0.15, 1.2, 16]} />
-                <meshStandardMaterial color={color} transparent opacity={0.1} wireframe />
-            </mesh>
-            <mesh position={[-0.2, -0.9, 0]}>
-                <cylinderGeometry args={[0.12, 0.15, 1.2, 16]} />
-                <meshStandardMaterial color={color} transparent opacity={0.1} wireframe />
-            </mesh>
-        </group>
+        <>
+            <Line
+                ref={lineRef}
+                points={curvePoints}
+                color={color}
+                lineWidth={1.5}
+                transparent
+                opacity={0.3 + healthLevel * 0.4}
+                dashed
+                dashSize={0.025}
+                dashScale={4}
+            />
+            {/* Glow line */}
+            <Line
+                points={curvePoints}
+                color={color}
+                lineWidth={4}
+                transparent
+                opacity={0.08}
+            />
+        </>
     );
 }
 
 // ==========================================
-// PARTICLE FIELD (Blood/Neural activity)
+// FLOATING PARTICLES
 // ==========================================
-function ParticleField({ count = 100, overallHealth }) {
+function FloatingParticles({ count = 50, overallHealth }) {
     const pointsRef = useRef();
     
     const particles = useMemo(() => {
@@ -353,10 +498,10 @@ function ParticleField({ count = 100, overallHealth }) {
         const colors = new Float32Array(count * 3);
         
         for (let i = 0; i < count; i++) {
-            // Distribute particles within body shape
+            // Distribute around body
             const theta = Math.random() * Math.PI * 2;
-            const y = (Math.random() - 0.3) * 3;
-            const radius = 0.3 + Math.random() * 0.3;
+            const y = (Math.random() - 0.3) * 2.5;
+            const radius = 0.4 + Math.random() * 0.3;
             
             positions[i * 3] = Math.cos(theta) * radius;
             positions[i * 3 + 1] = y;
@@ -366,7 +511,7 @@ function ParticleField({ count = 100, overallHealth }) {
             const isHealthy = Math.random() < overallHealth / 100;
             colors[i * 3] = isHealthy ? 0 : 1;
             colors[i * 3 + 1] = isHealthy ? 1 : 0;
-            colors[i * 3 + 2] = isHealthy ? 0.5 : 0.25;
+            colors[i * 3 + 2] = isHealthy ? 0.5 : 0.3;
         }
         
         return { positions, colors };
@@ -375,13 +520,7 @@ function ParticleField({ count = 100, overallHealth }) {
     useFrame((state) => {
         const t = state.clock.elapsedTime;
         if (pointsRef.current) {
-            pointsRef.current.rotation.y = t * 0.1;
-            
-            const positions = pointsRef.current.geometry.attributes.position.array;
-            for (let i = 0; i < count; i++) {
-                positions[i * 3 + 1] += Math.sin(t + i) * 0.002;
-            }
-            pointsRef.current.geometry.attributes.position.needsUpdate = true;
+            pointsRef.current.rotation.y = t * 0.05;
         }
     });
     
@@ -402,10 +541,10 @@ function ParticleField({ count = 100, overallHealth }) {
                 />
             </bufferGeometry>
             <pointsMaterial
-                size={0.03}
+                size={0.015}
                 vertexColors
                 transparent
-                opacity={0.8}
+                opacity={0.6}
                 sizeAttenuation
             />
         </points>
@@ -415,33 +554,35 @@ function ParticleField({ count = 100, overallHealth }) {
 // ==========================================
 // MAIN 3D SCENE
 // ==========================================
-function BodyScene({ organHealth, overallHealth, hoveredOrgan, setHoveredOrgan }) {
+function BodyScene({ organHealth, overallHealth, hoveredOrgan, selectedOrgan, setHoveredOrgan, setSelectedOrgan }) {
     return (
         <>
-            <ambientLight intensity={0.3} />
-            <pointLight position={[5, 5, 5]} intensity={1} color="#00F0FF" />
-            <pointLight position={[-5, 5, -5]} intensity={0.8} color="#FF00FF" />
-            <pointLight position={[0, -3, 3]} intensity={0.5} color="#00FF88" />
+            {/* Lighting */}
+            <ambientLight intensity={0.2} />
+            <pointLight position={[3, 3, 3]} intensity={0.6} color="#00F0FF" />
+            <pointLight position={[-3, 2, -2]} intensity={0.4} color="#FF00FF" />
+            <pointLight position={[0, -2, 2]} intensity={0.3} color="#00FF88" />
             
-            <Float speed={1} rotationIntensity={0.1} floatIntensity={0.2}>
-                <group>
-                    {/* Human body wireframe outline */}
-                    <HumanBodyOutline overallHealth={overallHealth} />
+            <Float speed={0.5} rotationIntensity={0.03} floatIntensity={0.08}>
+                <group scale={1.2} position={[0, -0.2, 0]}>
+                    {/* Human Body Hologram */}
+                    <HumanBodyHologram overallHealth={overallHealth} />
                     
-                    {/* Organs */}
-                    {Object.entries(ORGAN_SYSTEMS).map(([id, data], index) => (
-                        <Organ
+                    {/* Organ Nodes */}
+                    {Object.entries(ORGAN_SYSTEMS).map(([id, data]) => (
+                        <OrganNode
                             key={id}
                             id={id}
                             data={data}
                             damageLevel={organHealth[id] || 0}
                             isHovered={hoveredOrgan === id}
+                            isSelected={selectedOrgan === id}
                             onHover={setHoveredOrgan}
-                            pulsePhase={index * 0.5}
+                            onClick={setSelectedOrgan}
                         />
                     ))}
                     
-                    {/* Neural pathways */}
+                    {/* Neural Pathways */}
                     {NEURAL_PATHWAYS.map((pathway, index) => {
                         const avgDamage = ((organHealth[pathway.from] || 0) + (organHealth[pathway.to] || 0)) / 2;
                         return (
@@ -449,13 +590,12 @@ function BodyScene({ organHealth, overallHealth, hoveredOrgan, setHoveredOrgan }
                                 key={index}
                                 {...pathway}
                                 damageLevel={avgDamage}
-                                pulsePhase={index * 0.3}
                             />
                         );
                     })}
                     
-                    {/* Particle field */}
-                    <ParticleField count={150} overallHealth={overallHealth} />
+                    {/* Floating Particles */}
+                    <FloatingParticles count={60} overallHealth={overallHealth} />
                 </group>
             </Float>
             
@@ -463,75 +603,118 @@ function BodyScene({ organHealth, overallHealth, hoveredOrgan, setHoveredOrgan }
                 enablePan={false}
                 enableZoom={true}
                 minDistance={2}
-                maxDistance={8}
+                maxDistance={5}
                 autoRotate
-                autoRotateSpeed={0.5}
+                autoRotateSpeed={0.25}
+                maxPolarAngle={Math.PI * 0.75}
+                minPolarAngle={Math.PI * 0.25}
             />
         </>
     );
 }
 
 // ==========================================
-// ORGAN STATUS PANEL
+// ORGAN STATS PANEL - FUTURISTIC UI
 // ==========================================
-function OrganStatusPanel({ organHealth, hoveredOrgan }) {
+function OrganStatsPanel({ organHealth, selectedOrgan, setSelectedOrgan }) {
     const sortedOrgans = useMemo(() => {
         return Object.entries(ORGAN_SYSTEMS)
             .map(([id, data]) => ({
                 id,
                 ...data,
                 damage: organHealth[id] || 0,
-                health: 100 - (organHealth[id] || 0) * 100
+                health: Math.round((1 - (organHealth[id] || 0)) * 100)
             }))
             .sort((a, b) => b.damage - a.damage);
     }, [organHealth]);
     
     return (
-        <div className="absolute right-4 top-4 w-64 max-h-[calc(100%-2rem)] overflow-y-auto
-                        bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl p-3
-                        scrollbar-thin scrollbar-thumb-white/20">
-            <div className="text-[10px] font-mono text-white/50 mb-3 flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#00FF88] animate-pulse" />
-                SYSTEM STATUS
+        <div className="absolute right-4 top-4 bottom-4 w-52 flex flex-col gap-2 overflow-hidden">
+            {/* Header */}
+            <div className="bg-black/80 backdrop-blur-xl border border-[#00F0FF]/30 rounded-lg p-3">
+                <div className="flex items-center gap-2 text-[10px] font-mono text-[#00F0FF]">
+                    <div className="w-2 h-2 rounded-full bg-[#00F0FF] animate-pulse" />
+                    ORGAN TELEMETRY
+                </div>
             </div>
             
-            <div className="space-y-2">
-                {sortedOrgans.map(organ => {
-                    const isHovered = hoveredOrgan === organ.id;
+            {/* Organ list */}
+            <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 scrollbar-thin scrollbar-thumb-white/10">
+                {sortedOrgans.map((organ, index) => {
+                    const isSelected = selectedOrgan === organ.id;
                     const healthColor = organ.health > 80 ? '#00FF88' : 
-                                       organ.health > 50 ? '#FFFF00' : '#FF0044';
+                                       organ.health > 50 ? '#FFE600' : '#FF0044';
                     
                     return (
-                        <motion.div
+                        <motion.button
                             key={organ.id}
-                            animate={{ 
-                                scale: isHovered ? 1.02 : 1,
-                                borderColor: isHovered ? healthColor : 'rgba(255,255,255,0.1)'
-                            }}
-                            className="p-2 rounded-lg border transition-colors"
-                            style={{ background: `${healthColor}08` }}
+                            onClick={() => setSelectedOrgan(isSelected ? null : organ.id)}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.04 }}
+                            className={`w-full p-2.5 rounded-lg border text-left transition-all cursor-pointer
+                                       ${isSelected 
+                                           ? 'bg-white/10 border-[#00F0FF]' 
+                                           : 'bg-black/60 border-white/10 hover:border-white/30 hover:bg-white/5'
+                                       }`}
+                            style={isSelected ? { boxShadow: '0 0 15px rgba(0,240,255,0.2)' } : {}}
                         >
-                            <div className="flex justify-between items-center mb-1">
-                                <span className="text-[9px] font-mono text-white/70">{organ.name}</span>
+                            <div className="flex items-center justify-between mb-1.5">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm">{organ.icon}</span>
+                                    <span className="text-[10px] font-mono text-white/80">{organ.name}</span>
+                                </div>
                                 <span 
-                                    className="text-[10px] font-mono font-bold"
+                                    className="text-xs font-mono font-bold"
                                     style={{ color: healthColor }}
                                 >
-                                    {Math.round(organ.health)}%
+                                    {organ.health}%
                                 </span>
                             </div>
+                            
+                            {/* Health bar */}
                             <div className="h-1 bg-white/10 rounded-full overflow-hidden">
                                 <motion.div
                                     className="h-full rounded-full"
                                     style={{ background: healthColor }}
                                     initial={{ width: 0 }}
                                     animate={{ width: `${organ.health}%` }}
-                                    transition={{ duration: 1, ease: 'easeOut' }}
+                                    transition={{ duration: 0.6, delay: index * 0.04 }}
                                 />
                             </div>
-                        </motion.div>
+                            
+                            {/* Status indicator */}
+                            <div className="mt-1.5 flex items-center gap-1.5">
+                                <div 
+                                    className="w-1.5 h-1.5 rounded-full"
+                                    style={{ background: healthColor }}
+                                />
+                                <span className="text-[8px] font-mono text-white/40">
+                                    {organ.health > 80 ? 'OPTIMAL' : 
+                                     organ.health > 50 ? 'RECOVERING' : 'CRITICAL'}
+                                </span>
+                            </div>
+                        </motion.button>
                     );
                 })}
+            </div>
+            
+            {/* Legend */}
+            <div className="bg-black/80 backdrop-blur-xl border border-white/10 rounded-lg p-2.5">
+                <div className="flex justify-between text-[8px] font-mono">
+                    <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-[#00FF88]" />
+                        <span className="text-white/50">OPTIMAL</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-[#FFE600]" />
+                        <span className="text-white/50">HEALING</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-[#FF0044]" />
+                        <span className="text-white/50">DAMAGED</span>
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -546,7 +729,7 @@ function calculateOrganDamage(userProfile, quitDates, progress, entries) {
     if (!userProfile) {
         // Return default moderate damage if no profile
         Object.keys(ORGAN_SYSTEMS).forEach(id => {
-            organHealth[id] = 0.3;
+            organHealth[id] = 0.25;
         });
         return organHealth;
     }
@@ -556,19 +739,17 @@ function calculateOrganDamage(userProfile, quitDates, progress, entries) {
         let relevantSubstances = 0;
         
         Object.entries(organ.affectedBy).forEach(([substance, impactFactor]) => {
-            if (impactFactor < 0.1) return; // Skip minimal impact
+            if (impactFactor < 0.1) return;
             
             const profile = userProfile[substance];
             if (!profile || !profile.usageStartDate) return;
             
             relevantSubstances++;
             
-            // Calculate years of usage
             const usageStartDate = new Date(profile.usageStartDate);
             const quitDate = quitDates[substance] ? new Date(quitDates[substance]) : new Date();
-            const yearsOfUse = (quitDate - usageStartDate) / (365.25 * 24 * 60 * 60 * 1000);
+            const yearsOfUse = Math.max(0, (quitDate - usageStartDate) / (365.25 * 24 * 60 * 60 * 1000));
             
-            // Frequency multiplier (daily = 1, weekly = 0.3, monthly = 0.1, rarely = 0.05)
             const frequencyMultiplier = {
                 'multiple-daily': 1.2,
                 'daily': 1.0,
@@ -577,27 +758,21 @@ function calculateOrganDamage(userProfile, quitDates, progress, entries) {
                 'rarely': 0.05
             }[profile.frequency] || 0.5;
             
-            // Amount multiplier
             const amountMultiplier = {
                 'heavy': 1.2,
                 'moderate': 0.8,
                 'light': 0.4
             }[profile.amount] || 0.6;
             
-            // Base damage from usage history
             let baseDamage = Math.min(1, (yearsOfUse * frequencyMultiplier * amountMultiplier * impactFactor) / 10);
             
-            // Recovery factor - reduce damage based on days clean
             if (quitDates[substance] && progress[substance]) {
                 const daysSober = progress[substance]?.streak?.days || 0;
                 const recoveryDays = organ.recoveryDays[substance] || 180;
                 const recoveryProgress = Math.min(1, daysSober / recoveryDays);
-                
-                // Damage reduces as recovery progresses
                 baseDamage *= (1 - recoveryProgress * 0.9);
             }
             
-            // Recent relapse increases damage
             const recentRelapses = entries.filter(e => 
                 e.type === 'relapse' && 
                 e.substance === substance &&
@@ -623,16 +798,15 @@ function calculateOrganDamage(userProfile, quitDates, progress, entries) {
 // MAIN EXPORT COMPONENT
 // ==========================================
 export default function NeuralBodyVisualization({ userProfile, compact = false }) {
-    const { quitDates, progress, entries, overallHealth: contextHealth } = useRecovery();
+    const { quitDates, progress, entries } = useRecovery();
     const [hoveredOrgan, setHoveredOrgan] = useState(null);
+    const [selectedOrgan, setSelectedOrgan] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     
-    // Calculate organ damage based on user data
     const organHealth = useMemo(() => {
         return calculateOrganDamage(userProfile, quitDates, progress, entries);
     }, [userProfile, quitDates, progress, entries]);
     
-    // Calculate overall health
     const overallHealth = useMemo(() => {
         const damages = Object.values(organHealth);
         if (damages.length === 0) return 100;
@@ -641,113 +815,163 @@ export default function NeuralBodyVisualization({ userProfile, compact = false }
     }, [organHealth]);
     
     useEffect(() => {
-        const timer = setTimeout(() => setIsLoaded(true), 500);
+        const timer = setTimeout(() => setIsLoaded(true), 300);
         return () => clearTimeout(timer);
     }, []);
     
+    const healthColor = overallHealth > 70 ? '#00FF88' : overallHealth > 40 ? '#FFE600' : '#FF0044';
+    
+    // COMPACT VERSION
     if (compact) {
         return (
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="relative w-full h-[300px] rounded-xl overflow-hidden
-                           bg-gradient-to-br from-black via-[#050810] to-black
+                           bg-gradient-to-br from-[#030508] via-[#050810] to-[#030508]
                            border border-white/10"
             >
-                <Canvas camera={{ position: [0, 0.5, 4], fov: 50 }}>
+                {/* Scanlines */}
+                <div className="absolute inset-0 pointer-events-none opacity-30
+                                bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,240,255,0.03)_2px,rgba(0,240,255,0.03)_4px)]" />
+                
+                <Canvas camera={{ position: [0, 0.3, 2.8], fov: 45 }}>
                     <Suspense fallback={null}>
                         <BodyScene
                             organHealth={organHealth}
                             overallHealth={overallHealth}
                             hoveredOrgan={hoveredOrgan}
+                            selectedOrgan={selectedOrgan}
                             setHoveredOrgan={setHoveredOrgan}
+                            setSelectedOrgan={setSelectedOrgan}
                         />
                     </Suspense>
                 </Canvas>
                 
-                {/* Compact health display */}
-                <div className="absolute bottom-3 left-3 right-3 flex justify-between items-center
-                                bg-black/60 backdrop-blur-xl rounded-lg px-3 py-2 border border-white/10">
-                    <span className="text-[10px] font-mono text-white/50">NEURAL INTEGRITY</span>
-                    <span 
-                        className="text-lg font-mono font-bold"
-                        style={{ color: overallHealth > 70 ? '#00FF88' : overallHealth > 40 ? '#FFFF00' : '#FF0044' }}
-                    >
-                        {overallHealth}%
-                    </span>
+                {/* Health Display Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-3
+                                bg-gradient-to-t from-black/90 via-black/50 to-transparent">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: healthColor }} />
+                            <span className="text-[10px] font-mono text-white/60 tracking-wider">SYSTEM INTEGRITY</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-2xl font-mono font-black" style={{ color: healthColor }}>
+                                {overallHealth}%
+                            </span>
+                        </div>
+                    </div>
+                    {/* Health bar */}
+                    <div className="mt-2 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <motion.div
+                            className="h-full rounded-full"
+                            style={{ background: `linear-gradient(90deg, ${healthColor}, ${healthColor}80)` }}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${overallHealth}%` }}
+                            transition={{ duration: 1 }}
+                        />
+                    </div>
                 </div>
+                
+                {/* Corner decorations */}
+                <div className="absolute top-0 left-0 w-6 h-6 border-t border-l border-[#00F0FF]/50" />
+                <div className="absolute top-0 right-0 w-6 h-6 border-t border-r border-[#00F0FF]/50" />
             </motion.div>
         );
     }
     
+    // FULL VERSION
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
-            transition={{ duration: 0.6 }}
-            className="relative w-full h-[600px] rounded-2xl overflow-hidden
-                       bg-gradient-to-br from-black via-[#050810] to-black
+            transition={{ duration: 0.5 }}
+            className="relative w-full h-[650px] rounded-2xl overflow-hidden
+                       bg-gradient-to-br from-[#030508] via-[#050810] to-[#030508]
                        border border-white/10"
         >
-            {/* Scanline overlay */}
-            <div className="absolute inset-0 pointer-events-none z-10 
-                            bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,0,0,0.1)_2px,rgba(0,0,0,0.1)_4px)]" />
+            {/* Animated scanlines overlay */}
+            <div className="absolute inset-0 pointer-events-none z-10 opacity-40
+                            bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,240,255,0.02)_2px,rgba(0,240,255,0.02)_4px)]" />
             
-            {/* Header */}
+            {/* Header HUD */}
             <div className="absolute top-4 left-4 z-20">
-                <div className="flex items-center gap-2 mb-2">
-                    <div className="w-3 h-3 rounded-full animate-pulse"
-                         style={{ background: overallHealth > 70 ? '#00FF88' : overallHealth > 40 ? '#FFFF00' : '#FF0044' }} />
-                    <span className="text-[11px] font-mono text-white/60 tracking-widest">
+                <div className="flex items-center gap-3 mb-2">
+                    <div className="w-3 h-3 rounded-full animate-pulse" style={{ background: healthColor }} />
+                    <span className="text-[11px] font-mono text-white/50 tracking-[0.25em]">
                         NEURAL BODY MATRIX
                     </span>
                 </div>
-                <div className="text-4xl font-mono font-black tracking-tight"
-                     style={{ color: overallHealth > 70 ? '#00FF88' : overallHealth > 40 ? '#FFFF00' : '#FF0044' }}>
-                    {overallHealth}%
-                    <span className="text-sm font-normal text-white/40 ml-2">INTEGRITY</span>
+                
+                <div className="flex items-baseline gap-3">
+                    <span className="text-5xl font-mono font-black" style={{ color: healthColor }}>
+                        {overallHealth}%
+                    </span>
+                    <span className="text-sm font-mono text-white/40">INTEGRITY</span>
+                </div>
+                
+                {/* Status indicators */}
+                <div className="mt-4 flex flex-col gap-1.5">
+                    <div className="text-[9px] font-mono text-white/30 flex items-center gap-2">
+                        <span className="w-14 text-[#00F0FF]">STATUS:</span>
+                        <span className="text-white/60">
+                            {overallHealth > 80 ? 'OPTIMAL' : overallHealth > 50 ? 'RECOVERING' : 'CRITICAL'}
+                        </span>
+                    </div>
+                    <div className="text-[9px] font-mono text-white/30 flex items-center gap-2">
+                        <span className="w-14 text-[#00F0FF]">MODE:</span>
+                        <span className="text-white/60">LIVE MONITORING</span>
+                    </div>
+                    <div className="text-[9px] font-mono text-white/30 flex items-center gap-2">
+                        <span className="w-14 text-[#00F0FF]">ORGANS:</span>
+                        <span className="text-white/60">{Object.keys(ORGAN_SYSTEMS).length} TRACKED</span>
+                    </div>
                 </div>
             </div>
             
             {/* 3D Canvas */}
-            <Canvas camera={{ position: [0, 0.5, 5], fov: 45 }}>
+            <Canvas camera={{ position: [0, 0.3, 3.5], fov: 40 }}>
                 <Suspense fallback={null}>
                     <BodyScene
                         organHealth={organHealth}
                         overallHealth={overallHealth}
                         hoveredOrgan={hoveredOrgan}
+                        selectedOrgan={selectedOrgan}
                         setHoveredOrgan={setHoveredOrgan}
+                        setSelectedOrgan={setSelectedOrgan}
                     />
                 </Suspense>
             </Canvas>
             
-            {/* Organ Status Panel */}
-            <OrganStatusPanel organHealth={organHealth} hoveredOrgan={hoveredOrgan} />
+            {/* Organ Stats Panel */}
+            <OrganStatsPanel 
+                organHealth={organHealth} 
+                selectedOrgan={selectedOrgan}
+                setSelectedOrgan={setSelectedOrgan}
+            />
             
-            {/* Legend */}
-            <div className="absolute bottom-4 left-4 flex items-center gap-4 text-[9px] font-mono text-white/50">
-                <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 rounded-full bg-[#00FF88]" />
-                    HEALTHY
+            {/* Bottom info bar */}
+            <div className="absolute bottom-4 left-4 right-60 flex items-center justify-between
+                            text-[9px] font-mono text-white/30">
+                <div className="flex items-center gap-4">
+                    <span>◉ CLICK ORGAN TO INSPECT</span>
+                    <span>◉ DRAG TO ROTATE</span>
+                    <span>◉ SCROLL TO ZOOM</span>
                 </div>
-                <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 rounded-full bg-[#FFFF00]" />
-                    RECOVERING
-                </div>
-                <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 rounded-full bg-[#FF0044]" />
-                    DAMAGED
+                <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#00FF88] animate-pulse" />
+                    <span>LIVE</span>
                 </div>
             </div>
             
             {/* Corner decorations */}
-            <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-[#00F0FF]/30" />
-            <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-[#00F0FF]/30" />
-            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-[#00F0FF]/30" />
-            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#00F0FF]/30" />
+            <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-[#00F0FF]/30" />
+            <div className="absolute top-0 right-0 w-12 h-12 border-t-2 border-r-2 border-[#00F0FF]/30" />
+            <div className="absolute bottom-0 left-0 w-12 h-12 border-b-2 border-l-2 border-[#00F0FF]/30" />
+            <div className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-[#00F0FF]/30" />
         </motion.div>
     );
 }
 
-// Export sub-components for flexible use
 export { ORGAN_SYSTEMS, calculateOrganDamage };
