@@ -24,6 +24,7 @@ export default function Header() {
 
     const navItems = [
         { id: 'dashboard', label: 'COMMAND CENTER', icon: '⌘', shortLabel: 'CMD' },
+        { id: 'neural', label: 'NEURAL MAP', icon: '🧬', shortLabel: 'NEURAL' },
         { id: 'history', label: 'MISSION LOGS', icon: '📋', shortLabel: 'LOGS' },
         { id: 'stats', label: 'TELEMETRY', icon: '📊', shortLabel: 'STATS' }
     ];

@@ -5,6 +5,7 @@ import HistoryView from './components/HistoryView';
 import EntryForm from './components/EntryForm';
 import AuthTerminal from './components/AuthTerminal';
 import AnalyticsConsole from './components/AnalyticsConsole';
+import UsageAssessmentForm from './components/UsageAssessmentForm';
 import { Scene3DBackgroundLite } from './components/Scene3DBackground';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -106,6 +107,16 @@ export default function App() {
             </p>
           </div>
           <AnalyticsConsole />
+        </motion.div>
+      );
+      case 'neural': return (
+        <motion.div 
+          className="dashboard p-4 md:p-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <UsageAssessmentForm />
         </motion.div>
       );
       case 'entry': return (

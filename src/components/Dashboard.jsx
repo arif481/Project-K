@@ -7,6 +7,7 @@ import LiveRecoveryMonitor from './LiveRecoveryMonitor';
 import EntryForm from './EntryForm';
 import SettingsModal from './SettingsModal';
 import SubstanceDashboard from './SubstanceDashboard';
+import NeuralBodyVisualization from './NeuralBodyVisualization';
 
 // Animated stat card component
 function StatCard({ label, value, subValue, color, icon, delay = 0, booted }) {
@@ -77,7 +78,7 @@ function QuickActionButton({ onClick, icon, label, color, delay }) {
 }
 
 export default function Dashboard() {
-    const { progress, advancedStats, overallHealth, quitDates, entries } = useRecovery();
+    const { progress, advancedStats, overallHealth, quitDates, entries, userSettings } = useRecovery();
     const [showEntryModal, setShowEntryModal] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [modalType, setModalType] = useState('quit');
@@ -211,6 +212,26 @@ export default function Dashboard() {
                     transition={{ delay: 0.3, duration: 0.6 }}
                 >
                     <LiveRecoveryMonitor />
+                    
+                    {/* Neural Body Compact Preview */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={booted ? { opacity: 1, y: 0 } : {}}
+                        transition={{ delay: 0.5, duration: 0.5 }}
+                        className="relative"
+                    >
+                        <div className="text-[10px] font-mono text-[var(--text-secondary)] border-b border-[var(--border-dim)] pb-2 mb-3 flex items-center justify-between">
+                            <span className="flex items-center gap-2">
+                                <span className="text-lg">🧬</span>
+                                NEURAL BODY STATUS
+                            </span>
+                            <span className="text-[var(--neon-cyan)]">LIVE</span>
+                        </div>
+                        <NeuralBodyVisualization 
+                            userProfile={userSettings?.usageProfile} 
+                            compact={true} 
+                        />
+                    </motion.div>
                 </motion.div>
 
                 {/* CENTER: THE MATRIX (4 Cols) */}
