@@ -18,14 +18,14 @@ function StatCard({ label, value, subValue, color, icon, delay = 0, booted }) {
             transition={{ delay, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
             className="relative group"
         >
-            <div className="hud-card p-4 h-full flex flex-col justify-between bg-gradient-to-br from-[rgba(10,15,25,0.8)] to-[rgba(5,10,18,0.9)] hover:from-[rgba(15,22,35,0.85)] transition-all duration-500">
+            <div className="hud-card p-4 h-full flex flex-col justify-between bg-linear-to-br from-[rgba(10,15,25,0.8)] to-[rgba(5,10,18,0.9)] hover:from-[rgba(15,22,35,0.85)] transition-all duration-500">
                 {/* Animated corner glow on hover */}
                 <div className="absolute top-0 left-0 w-12 h-12 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                     <div className="absolute inset-0 blur-xl" style={{ background: color, opacity: 0.3 }} />
                 </div>
                 
                 <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-mono tracking-[0.2em] text-[var(--text-secondary)] uppercase">{label}</span>
+                    <span className="text-[10px] font-mono tracking-[0.2em] text-(--text-secondary) uppercase">{label}</span>
                     <span className="text-lg opacity-60">{icon}</span>
                 </div>
                 
@@ -39,12 +39,12 @@ function StatCard({ label, value, subValue, color, icon, delay = 0, booted }) {
                         {value}
                     </motion.div>
                     {subValue && (
-                        <span className="text-[10px] font-mono text-[var(--text-dim)] mb-1">{subValue}</span>
+                        <span className="text-[10px] font-mono text-(--text-dim) mb-1">{subValue}</span>
                     )}
                 </div>
                 
                 {/* Progress indicator line */}
-                <div className="mt-3 h-1 bg-[var(--bg-grid)] rounded-full overflow-hidden">
+                <div className="mt-3 h-1 bg-(--bg-grid) rounded-full overflow-hidden">
                     <motion.div 
                         className="h-full rounded-full"
                         style={{ background: `linear-gradient(90deg, ${color}, transparent)` }}
@@ -68,7 +68,7 @@ function QuickActionButton({ onClick, icon, label, color, delay }) {
             whileHover={{ scale: 1.1, boxShadow: `0 0 30px ${color}40` }}
             whileTap={{ scale: 0.95 }}
             onClick={onClick}
-            className="flex flex-col items-center gap-2 p-4 rounded-lg border border-[var(--border-dim)] bg-[var(--bg-glass)] backdrop-blur-xl hover:border-opacity-60 transition-all"
+            className="flex flex-col items-center gap-2 p-4 rounded-lg border border-(--border-dim) bg-(--bg-glass) backdrop-blur-xl hover:border-opacity-60 transition-all"
             style={{ borderColor: color }}
         >
             <span className="text-2xl">{icon}</span>
@@ -119,7 +119,7 @@ export default function Dashboard() {
             <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
                 <motion.button 
                     onClick={() => setShowQuickActions(!showQuickActions)} 
-                    className="text-[var(--neon-green)] hover:text-white border border-[var(--neon-green)] px-3 py-1.5 text-[10px] font-mono bg-black/60 backdrop-blur-xl flex items-center gap-2"
+                    className="text-(--neon-green) hover:text-white border border-(--neon-green) px-3 py-1.5 text-[10px] font-mono bg-black/60 backdrop-blur-xl flex items-center gap-2"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                 >
@@ -127,7 +127,7 @@ export default function Dashboard() {
                 </motion.button>
                 <motion.button 
                     onClick={() => setShowSettings(true)} 
-                    className="text-[var(--neon-cyan)] hover:text-white border border-[var(--neon-cyan)] px-3 py-1.5 text-[10px] font-mono bg-black/60 backdrop-blur-xl"
+                    className="text-(--neon-cyan) hover:text-white border border-(--neon-cyan) px-3 py-1.5 text-[10px] font-mono bg-black/60 backdrop-blur-xl"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                 >
@@ -142,7 +142,7 @@ export default function Dashboard() {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className="absolute top-16 right-4 z-40 flex gap-3 bg-[var(--bg-panel)] p-4 border border-[var(--border-dim)] backdrop-blur-xl"
+                        className="absolute top-16 right-4 z-40 flex gap-3 bg-(--bg-panel) p-4 border border-(--border-dim) backdrop-blur-xl"
                     >
                         <QuickActionButton onClick={() => handleAction('log', 'cigarettes')} icon="🚬" label="Log Nicotine" color="var(--neon-cyan)" delay={0.1} />
                         <QuickActionButton onClick={() => handleAction('log', 'cannabis')} icon="🌿" label="Log Cannabis" color="var(--neon-green)" delay={0.15} />
@@ -220,12 +220,12 @@ export default function Dashboard() {
                         transition={{ delay: 0.5, duration: 0.5 }}
                         className="relative"
                     >
-                        <div className="text-[10px] font-mono text-[var(--text-secondary)] border-b border-[var(--border-dim)] pb-2 mb-3 flex items-center justify-between">
+                        <div className="text-[10px] font-mono text-(--text-secondary) border-b border-(--border-dim) pb-2 mb-3 flex items-center justify-between">
                             <span className="flex items-center gap-2">
                                 <span className="text-lg">🧬</span>
                                 NEURAL BODY STATUS
                             </span>
-                            <span className="text-[var(--neon-cyan)]">LIVE</span>
+                            <span className="text-(--neon-cyan)">LIVE</span>
                         </div>
                         <NeuralBodyVisualization 
                             userProfile={userSettings?.usageProfile} 
@@ -261,14 +261,14 @@ export default function Dashboard() {
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={booted ? { opacity: 1, y: 0 } : {}}
                                     transition={{ delay: 0.6 + idx * 0.1 }}
-                                    className={`p-3 text-center border ${isActive ? 'border-opacity-100' : 'border-opacity-30 opacity-50'} bg-[var(--bg-grid)]`}
+                                    className={`p-3 text-center border ${isActive ? 'border-opacity-100' : 'border-opacity-30 opacity-50'} bg-(--bg-grid)`}
                                     style={{ borderColor: isActive ? colors[sub] : 'var(--border-dim)' }}
                                 >
                                     <div className="text-lg mb-1">{icons[sub]}</div>
                                     <div className="text-xl font-mono font-bold" style={{ color: isActive ? colors[sub] : 'var(--text-dim)' }}>
                                         {days}
                                     </div>
-                                    <div className="text-[8px] font-mono text-[var(--text-secondary)] uppercase">days</div>
+                                    <div className="text-[8px] font-mono text-(--text-secondary) uppercase">days</div>
                                 </motion.div>
                             );
                         })}
@@ -278,13 +278,13 @@ export default function Dashboard() {
                 {/* RIGHT: PROTOCOL MODULES (4 Cols) */}
                 <div className="lg:col-span-4 flex flex-col gap-4">
                     <motion.div 
-                        className="text-[10px] font-mono text-[var(--text-secondary)] border-b border-[var(--border-dim)] pb-2 flex items-center justify-between"
+                        className="text-[10px] font-mono text-(--text-secondary) border-b border-(--border-dim) pb-2 flex items-center justify-between"
                         initial={{ opacity: 0 }}
                         animate={booted ? { opacity: 1 } : {}}
                         transition={{ delay: 0.5 }}
                     >
                         <span>ACTIVE PROTOCOLS</span>
-                        <span className="text-[var(--neon-cyan)]">{activeProtocols}/3 ONLINE</span>
+                        <span className="text-(--neon-cyan)">{activeProtocols}/3 ONLINE</span>
                     </motion.div>
                     
                     {substances.map((sub, idx) => (
@@ -323,7 +323,7 @@ export default function Dashboard() {
                             exit={{ scale: 0.9, opacity: 0, y: 20 }}
                             transition={{ type: "spring", damping: 25 }}
                         >
-                            <HudCard title="DATA ENTRY TERMINAL" className="w-full max-w-lg relative border-[var(--neon-cyan)] shadow-[0_0_60px_rgba(0,240,255,0.15)]">
+                            <HudCard title="DATA ENTRY TERMINAL" className="w-full max-w-lg relative border-(--neon-cyan) shadow-[0_0_60px_rgba(0,240,255,0.15)]">
                                 <EntryForm
                                     initialSubstance={activeSubstance}
                                     initialType={modalType}

@@ -44,8 +44,8 @@ export default function Header() {
             transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
             className={`sticky top-0 z-50 w-full border-b transition-all duration-300 ${
                 isScrolled 
-                    ? 'border-[var(--border-bright)] bg-[rgba(3,5,8,0.95)] backdrop-blur-xl shadow-lg shadow-black/20' 
-                    : 'border-[var(--border-dim)] bg-[var(--bg-panel)]/80 backdrop-blur-xl'
+                    ? 'border-(--border-bright) bg-[rgba(3,5,8,0.95)] backdrop-blur-xl shadow-lg shadow-black/20' 
+                    : 'border-(--border-dim) bg-(--bg-panel)/80 backdrop-blur-xl'
             }`}
         >
             <div className="max-w-[1920px] mx-auto px-4 md:px-6">
@@ -69,14 +69,14 @@ export default function Header() {
                                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                             />
                             <div 
-                                className="absolute inset-[2px] bg-[var(--bg-void)] rounded-md flex items-center justify-center"
+                                className="absolute inset-[2px] bg-(--bg-void) rounded-md flex items-center justify-center"
                             >
                                 <span className="text-lg font-black text-gradient">K</span>
                             </div>
                             
                             {/* Pulse indicator */}
                             <motion.span 
-                                className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[var(--neon-green-hex)] rounded-full"
+                                className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-(--neon-green-hex) rounded-full"
                                 animate={{ scale: [1, 1.3, 1], opacity: [1, 0.7, 1] }}
                                 transition={{ duration: 2, repeat: Infinity }}
                             />
@@ -85,23 +85,23 @@ export default function Header() {
                         <div className="flex flex-col">
                             <span className="text-sm font-bold tracking-[0.25em] text-white">RECOVERY.OS</span>
                             <div className="flex items-center gap-2">
-                                <span className="text-[9px] text-[var(--neon-cyan-hex)] tracking-widest font-mono">V.4.0.0</span>
-                                <span className="w-1 h-1 bg-[var(--neon-green-hex)] rounded-full animate-pulse" />
-                                <span className="text-[9px] text-[var(--neon-green-hex)] font-mono">ONLINE</span>
+                                <span className="text-[9px] text-(--neon-cyan-hex) tracking-widest font-mono">V.4.0.0</span>
+                                <span className="w-1 h-1 bg-(--neon-green-hex) rounded-full animate-pulse" />
+                                <span className="text-[9px] text-(--neon-green-hex) font-mono">ONLINE</span>
                             </div>
                         </div>
                     </div>
 
                     {/* CENTER: NAVIGATION */}
-                    <nav className="hidden md:flex items-center bg-[var(--bg-grid)] rounded-lg p-1">
+                    <nav className="hidden md:flex items-center bg-(--bg-grid) rounded-lg p-1">
                         {navItems.map((item, idx) => (
                             <motion.button
                                 key={item.id}
                                 onClick={() => setCurrentView(item.id)}
                                 className={`relative px-5 py-2 text-xs font-mono tracking-wider transition-all flex items-center gap-2 rounded-md ${
                                     currentView === item.id
-                                        ? 'text-[var(--bg-void)]'
-                                        : 'text-[var(--text-secondary)] hover:text-white'
+                                        ? 'text-(--bg-void)'
+                                        : 'text-(--text-secondary) hover:text-white'
                                 }`}
                                 whileHover={{ scale: currentView !== item.id ? 1.02 : 1 }}
                                 whileTap={{ scale: 0.98 }}
@@ -109,7 +109,7 @@ export default function Header() {
                                 {currentView === item.id && (
                                     <motion.div
                                         layoutId="nav-bg"
-                                        className="absolute inset-0 bg-gradient-to-r from-[var(--neon-cyan-hex)] to-[var(--neon-green-hex)] rounded-md"
+                                        className="absolute inset-0 bg-linear-to-r from-(--neon-cyan-hex) to-(--neon-green-hex) rounded-md"
                                         transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                     />
                                 )}
@@ -125,28 +125,28 @@ export default function Header() {
                         
                         {/* Live Clock */}
                         <div className="hidden sm:flex flex-col items-end">
-                            <span className="text-xs font-mono text-[var(--neon-cyan-hex)] tabular-nums tracking-wider">
+                            <span className="text-xs font-mono text-(--neon-cyan-hex) tabular-nums tracking-wider">
                                 {formatTime(currentTime)}
                             </span>
-                            <span className="text-[9px] font-mono text-[var(--text-dim)]">
+                            <span className="text-[9px] font-mono text-(--text-dim)">
                                 {formatDate(currentTime)}
                             </span>
                         </div>
 
                         {/* Divider */}
-                        <div className="hidden sm:block w-px h-8 bg-[var(--border-dim)]" />
+                        <div className="hidden sm:block w-px h-8 bg-(--border-dim)" />
 
                         {/* System Health */}
                         <div className="hidden md:flex flex-col items-end gap-1">
                             <div className="flex items-center gap-2">
-                                <span className="text-[9px] font-mono text-[var(--text-dim)] uppercase">SYS</span>
+                                <span className="text-[9px] font-mono text-(--text-dim) uppercase">SYS</span>
                                 <span className="text-xs font-mono font-bold" style={{ 
                                     color: overallHealth > 70 ? 'var(--neon-green-hex)' : overallHealth > 40 ? 'var(--neon-yellow-hex)' : 'var(--neon-magenta-hex)'
                                 }}>
                                     {Math.round(overallHealth)}%
                                 </span>
                             </div>
-                            <div className="w-24 h-1.5 bg-[var(--bg-muted)] overflow-hidden rounded-full">
+                            <div className="w-24 h-1.5 bg-(--bg-muted) overflow-hidden rounded-full">
                                 <motion.div 
                                     className="h-full rounded-full"
                                     style={{ 
@@ -179,13 +179,13 @@ export default function Header() {
                         )}
 
                         {/* Divider */}
-                        <div className="hidden md:block w-px h-8 bg-[var(--border-dim)]" />
+                        <div className="hidden md:block w-px h-8 bg-(--border-dim)" />
 
                         {/* User Info */}
                         {user && (
                             <div className="flex items-center gap-3">
                                 <div className="hidden sm:flex flex-col items-end">
-                                    <span className="text-[9px] font-mono text-[var(--text-dim)] uppercase">OPERATOR</span>
+                                    <span className="text-[9px] font-mono text-(--text-dim) uppercase">OPERATOR</span>
                                     <span className="text-xs text-white font-mono truncate max-w-[100px]">
                                         {user.displayName || user.email?.split('@')[0] || 'ANON'}
                                     </span>
@@ -194,7 +194,7 @@ export default function Header() {
                                     whileHover={{ scale: 1.1, borderColor: 'var(--neon-magenta-hex)' }}
                                     whileTap={{ scale: 0.9 }}
                                     onClick={logout}
-                                    className="p-2 text-[var(--text-secondary)] hover:text-[var(--neon-magenta-hex)] border border-[var(--border-dim)] hover:border-[var(--neon-magenta-hex)] transition-all rounded"
+                                    className="p-2 text-(--text-secondary) hover:text-(--neon-magenta-hex) border border-(--border-dim) hover:border-(--neon-magenta-hex) transition-all rounded"
                                     title="Terminate Session"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -208,7 +208,7 @@ export default function Header() {
                         <motion.button 
                             whileTap={{ scale: 0.9 }}
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            className="md:hidden text-[var(--neon-cyan-hex)] p-2 border border-[var(--border-dim)] rounded"
+                            className="md:hidden text-(--neon-cyan-hex) p-2 border border-(--border-dim) rounded"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 {mobileMenuOpen ? (
@@ -230,7 +230,7 @@ export default function Header() {
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="md:hidden border-t border-[var(--border-dim)] overflow-hidden bg-[var(--bg-panel)]"
+                        className="md:hidden border-t border-(--border-dim) overflow-hidden bg-(--bg-panel)"
                     >
                         <div className="flex flex-col p-2">
                             {navItems.map((item, idx) => (
@@ -245,8 +245,8 @@ export default function Header() {
                                     }}
                                     className={`py-4 px-4 text-sm font-mono tracking-wider text-left transition-all flex items-center gap-4 rounded-lg ${
                                         currentView === item.id
-                                            ? 'text-[var(--bg-void)] bg-gradient-to-r from-[var(--neon-cyan-hex)] to-[var(--neon-green-hex)]'
-                                            : 'text-[var(--text-secondary)] hover:bg-[var(--bg-grid)]'
+                                            ? 'text-(--bg-void) bg-linear-to-r from-(--neon-cyan-hex) to-(--neon-green-hex)'
+                                            : 'text-(--text-secondary) hover:bg-(--bg-grid)'
                                     }`}
                                 >
                                     <span className="text-lg">{item.icon}</span>
@@ -256,24 +256,24 @@ export default function Header() {
                         </div>
                         
                         {/* Mobile Stats Row */}
-                        <div className="border-t border-[var(--border-dim)] p-4 grid grid-cols-2 gap-4">
+                        <div className="border-t border-(--border-dim) p-4 grid grid-cols-2 gap-4">
                             <div className="flex flex-col">
-                                <span className="text-[9px] font-mono text-[var(--text-dim)]">SYSTEM HEALTH</span>
-                                <span className="text-lg font-mono font-bold text-[var(--neon-cyan-hex)]">{Math.round(overallHealth)}%</span>
+                                <span className="text-[9px] font-mono text-(--text-dim)">SYSTEM HEALTH</span>
+                                <span className="text-lg font-mono font-bold text-(--neon-cyan-hex)">{Math.round(overallHealth)}%</span>
                             </div>
                             {advancedStats?.currentRank && (
                                 <div className="flex flex-col items-end">
-                                    <span className="text-[9px] font-mono text-[var(--text-dim)]">RANK</span>
-                                    <span className="text-lg font-mono font-bold text-[var(--neon-purple-hex)]">{advancedStats.currentRank}</span>
+                                    <span className="text-[9px] font-mono text-(--text-dim)">RANK</span>
+                                    <span className="text-lg font-mono font-bold text-(--neon-purple-hex)">{advancedStats.currentRank}</span>
                                 </div>
                             )}
                         </div>
                         
                         {/* Mobile User Info */}
                         {user && (
-                            <div className="border-t border-[var(--border-dim)] p-4 flex items-center justify-between">
+                            <div className="border-t border-(--border-dim) p-4 flex items-center justify-between">
                                 <div className="flex flex-col">
-                                    <span className="text-[9px] font-mono text-[var(--text-dim)]">OPERATOR</span>
+                                    <span className="text-[9px] font-mono text-(--text-dim)">OPERATOR</span>
                                     <span className="text-sm text-white font-mono">
                                         {user.displayName || user.email?.split('@')[0] || 'ANON'}
                                     </span>
@@ -281,7 +281,7 @@ export default function Header() {
                                 <motion.button
                                     whileTap={{ scale: 0.9 }}
                                     onClick={logout}
-                                    className="px-4 py-2 text-[var(--neon-magenta-hex)] border border-[var(--neon-magenta-hex)] text-xs font-mono"
+                                    className="px-4 py-2 text-(--neon-magenta-hex) border border-(--neon-magenta-hex) text-xs font-mono"
                                 >
                                     LOGOUT
                                 </motion.button>

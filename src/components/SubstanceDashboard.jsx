@@ -232,9 +232,9 @@ const MilestoneIndicator = ({ days, milestones, color }) => {
     
     return (
         <div className="relative">
-            <div className="flex justify-between text-[9px] font-mono text-[var(--text-dim)] mb-1">
+            <div className="flex justify-between text-[9px] font-mono text-(--text-dim) mb-1">
                 <span>DAY {prevMilestone}</span>
-                <span className="text-[var(--text-secondary)]">NEXT: DAY {nextMilestone}</span>
+                <span className="text-(--text-secondary)">NEXT: DAY {nextMilestone}</span>
             </div>
             <div className="h-1.5 bg-[rgba(255,255,255,0.1)] rounded-full overflow-hidden">
                 <motion.div
@@ -334,8 +334,8 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
                 animate={{ opacity: 1, y: 0 }}
                 className="relative group"
             >
-                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent rounded-xl" />
-                <HudCard className="p-5 border-dashed border-[var(--border-dim)] opacity-60 hover:opacity-80 transition-opacity">
+                <div className="absolute inset-0 bg-linear-to-br from-white/[0.02] to-transparent rounded-xl" />
+                <HudCard className="p-5 border-dashed border-(--border-dim) opacity-60 hover:opacity-80 transition-opacity">
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 rounded-xl bg-[rgba(255,255,255,0.05)] flex items-center justify-center text-2xl">
@@ -343,7 +343,7 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
                             </div>
                             <div>
                                 <span className="text-sm font-bold uppercase tracking-widest text-white block">{config.label}</span>
-                                <span className="text-[10px] text-[var(--text-dim)]">PROTOCOL OFFLINE</span>
+                                <span className="text-[10px] text-(--text-dim)">PROTOCOL OFFLINE</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -352,17 +352,17 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
                         </div>
                     </div>
                     
-                    <div className="text-center py-6 border-y border-[var(--border-dim)] border-dashed">
+                    <div className="text-center py-6 border-y border-(--border-dim) border-dashed">
                         <div className="text-4xl mb-2 opacity-30">{config.icon}</div>
-                        <p className="text-[var(--text-secondary)] text-xs mb-1">Recovery protocol not initialized</p>
-                        <p className="text-[var(--text-dim)] text-[10px]">Begin your journey to freedom</p>
+                        <p className="text-(--text-secondary) text-xs mb-1">Recovery protocol not initialized</p>
+                        <p className="text-(--text-dim) text-[10px]">Begin your journey to freedom</p>
                     </div>
                     
                     <motion.button
                         onClick={() => onInitialize && onInitialize(substance)}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className="w-full mt-6 py-3 border border-[var(--text-secondary)] text-[var(--text-secondary)] 
+                        className="w-full mt-6 py-3 border border-(--text-secondary) text-(--text-secondary) 
                                    hover:border-white hover:text-white hover:bg-white/5
                                    text-xs font-mono transition-all duration-300 rounded-lg
                                    flex items-center justify-center gap-2"
@@ -418,7 +418,7 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
                             </motion.div>
                             <div>
                                 <span className="text-sm font-bold uppercase tracking-widest text-white block">{config.label}</span>
-                                <span className="text-[10px] text-[var(--text-dim)]">RECOVERY ACTIVE</span>
+                                <span className="text-[10px] text-(--text-dim)">RECOVERY ACTIVE</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -433,7 +433,7 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
                     </div>
 
                     {/* HERO SECTION - Days Clean with Circular Progress */}
-                    <div className="flex items-center justify-center gap-6 py-4 border-y border-[var(--border-dim)]">
+                    <div className="flex items-center justify-center gap-6 py-4 border-y border-(--border-dim)">
                         <div className="relative">
                             <CircularProgress 
                                 progress={Math.min((substanceProgress?.progress || 0), 100)} 
@@ -445,12 +445,12 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
                                 <div className="text-3xl font-mono font-black text-white">
                                     {days}
                                 </div>
-                                <div className="text-[8px] text-[var(--text-dim)] tracking-wider">DAYS</div>
+                                <div className="text-[8px] text-(--text-dim) tracking-wider">DAYS</div>
                             </div>
                         </div>
                         
                         <div className="text-left">
-                            <div className="text-[10px] text-[var(--text-secondary)] mb-1">CURRENT BENEFIT</div>
+                            <div className="text-[10px] text-(--text-secondary) mb-1">CURRENT BENEFIT</div>
                             <div className="text-sm text-white font-medium mb-2">{currentBenefit?.benefit}</div>
                             <button 
                                 onClick={() => setShowHealthInfo(!showHealthInfo)}
@@ -471,7 +471,7 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
                                 exit={{ height: 0, opacity: 0 }}
                                 className="overflow-hidden"
                             >
-                                <div className="py-3 space-y-2 border-b border-[var(--border-dim)] max-h-[300px] overflow-y-auto scrollbar-thin">
+                                <div className="py-3 space-y-2 border-b border-(--border-dim) max-h-[300px] overflow-y-auto scrollbar-thin">
                                     {config.healthBenefits.map((b, i) => {
                                         // Calculate if this benefit has been achieved
                                         // For hour-based benefits, convert to days
@@ -509,7 +509,7 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
                             className="bg-[rgba(0,255,136,0.05)] p-3 rounded-lg border border-[rgba(0,255,136,0.1)]"
                             whileHover={{ scale: 1.02, borderColor: 'rgba(0,255,136,0.3)' }}
                         >
-                            <div className="text-[9px] text-[var(--text-dim)] mb-1 flex items-center gap-1">
+                            <div className="text-[9px] text-(--text-dim) mb-1 flex items-center gap-1">
                                 <span>💰</span> CAPITAL SAVED
                             </div>
                             <div className="text-lg font-mono font-bold">
@@ -522,7 +522,7 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
                             className="bg-[rgba(0,240,255,0.05)] p-3 rounded-lg border border-[rgba(0,240,255,0.1)]"
                             whileHover={{ scale: 1.02, borderColor: 'rgba(0,240,255,0.3)' }}
                         >
-                            <div className="text-[9px] text-[var(--text-dim)] mb-1 flex items-center gap-1">
+                            <div className="text-[9px] text-(--text-dim) mb-1 flex items-center gap-1">
                                 <span>⏱️</span> LIFE REGAINED
                             </div>
                             <div className="text-lg font-mono font-bold">
@@ -535,7 +535,7 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
                             className="bg-[rgba(147,51,234,0.05)] p-3 rounded-lg border border-[rgba(147,51,234,0.1)]"
                             whileHover={{ scale: 1.02, borderColor: 'rgba(147,51,234,0.3)' }}
                         >
-                            <div className="text-[9px] text-[var(--text-dim)] mb-1 flex items-center gap-1">
+                            <div className="text-[9px] text-(--text-dim) mb-1 flex items-center gap-1">
                                 <span>📊</span> RECOVERY
                             </div>
                             <div className="text-lg font-mono font-bold text-[#9333EA]">
@@ -548,7 +548,7 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
                             className="bg-[rgba(255,255,255,0.02)] p-3 rounded-lg border border-[rgba(255,255,255,0.05)]"
                             whileHover={{ scale: 1.02, borderColor: 'rgba(255,255,255,0.1)' }}
                         >
-                            <div className="text-[9px] text-[var(--text-dim)] mb-1 flex items-center gap-1">
+                            <div className="text-[9px] text-(--text-dim) mb-1 flex items-center gap-1">
                                 <span>📅</span> INITIATED
                             </div>
                             <div className="text-sm font-mono text-white">

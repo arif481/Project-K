@@ -107,14 +107,14 @@ export default function BrainVisualization({ substance }) {
                             initial={{ opacity: 0, scale: 0.9, y: 10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9 }}
-                            className="absolute z-50 bg-black border border-[var(--neon-green)] p-3 shadow-[0_0_15px_rgba(0,255,159,0.3)] pointer-events-none"
+                            className="absolute z-50 bg-black border border-(--neon-green) p-3 shadow-[0_0_15px_rgba(0,255,159,0.3)] pointer-events-none"
                             style={{
                                 left: tooltipPos.x + 20,
                                 top: tooltipPos.y,
                                 transform: 'translate(-50%, -100%)'
                             }}
                         >
-                            <div className="text-[var(--neon-green)] font-mono text-xs font-bold mb-1 border-b border-[var(--border-dim)] pb-1">
+                            <div className="text-(--neon-green) font-mono text-xs font-bold mb-1 border-b border-(--border-dim) pb-1">
                                 {ntStatus[hoveredRegion].name.toUpperCase()}
                             </div>
                             <div className="text-white font-mono text-xl font-bold">
@@ -128,9 +128,9 @@ export default function BrainVisualization({ substance }) {
             {/* Legend */}
             <div className="grid grid-cols-2 gap-2 mt-4">
                 {Object.entries(ntStatus).map(([key, data]) => (
-                    <div key={key} className="flex items-center gap-2 bg-[var(--bg-grid)] p-2 border border-[var(--border-dim)]">
+                    <div key={key} className="flex items-center gap-2 bg-(--bg-grid) p-2 border border-(--border-dim)">
                         <span className="w-2 h-2 rounded-full" style={{ background: getRegionColor(data), boxShadow: `0 0 5px ${getRegionColor(data)}` }} />
-                        <span className="text-[10px] text-[var(--text-secondary)] font-mono uppercase truncate">{data.name}</span>
+                        <span className="text-[10px] text-(--text-secondary) font-mono uppercase truncate">{data.name}</span>
                     </div>
                 ))}
             </div>

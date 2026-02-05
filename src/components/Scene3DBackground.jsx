@@ -333,7 +333,7 @@ export function Scene3DBackground() {
                 <ambientLight intensity={0.1} />
             </Canvas>
             
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#030508] pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-[#030508] pointer-events-none" />
         </div>
     );
 }
@@ -364,7 +364,7 @@ export function Scene3DBackgroundLite() {
                 <ambientLight intensity={0.05} />
             </Canvas>
             
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(3,5,8,0.3)] to-[#030508] pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-b from-transparent via-[rgba(3,5,8,0.3)] to-[#030508] pointer-events-none" />
         </div>
     );
 }

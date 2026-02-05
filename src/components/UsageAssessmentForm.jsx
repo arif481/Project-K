@@ -552,7 +552,7 @@ export default function UsageAssessmentForm({ onComplete, existingProfile = null
                         whileTap={{ scale: canSave ? 0.98 : 1 }}
                         className={`w-full py-4 rounded-xl font-mono text-sm font-bold transition-all
                                    ${canSave 
-                                       ? 'bg-gradient-to-r from-[#00F0FF] to-[#00FF88] text-black' 
+                                       ? 'bg-linear-to-r from-[#00F0FF] to-[#00FF88] text-black' 
                                        : 'bg-white/5 text-white/30 cursor-not-allowed'
                                    }`}
                         style={canSave ? { boxShadow: '0 0 40px rgba(0,240,255,0.3)' } : {}}

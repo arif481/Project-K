@@ -133,16 +133,16 @@ export default function BodyVisualization({ substance = null }) {
                             initial={{ opacity: 0, scale: 0.9, x: 10 }}
                             animate={{ opacity: 1, scale: 1, x: 0 }}
                             exit={{ opacity: 0, scale: 0.9 }}
-                            className="absolute z-50 bg-black border border-[var(--neon-cyan)] p-3 rounded-none shadow-[0_0_15px_rgba(0,240,255,0.3)] pointer-events-none"
+                            className="absolute z-50 bg-black border border-(--neon-cyan) p-3 rounded-none shadow-[0_0_15px_rgba(0,240,255,0.3)] pointer-events-none"
                             style={{ left: tooltipPos.x + 20, top: tooltipPos.y }}
                         >
-                            <div className="text-[var(--neon-cyan)] font-mono text-xs font-bold mb-1">
+                            <div className="text-(--neon-cyan) font-mono text-xs font-bold mb-1">
                                 {BODY_SYSTEMS[hoveredOrgan].name.toUpperCase()}
                             </div>
                             <div className="text-white font-mono text-xl font-bold">
                                 {Math.round(systemHealth[hoveredOrgan])}%
                             </div>
-                            <div className="text-[var(--text-secondary)] text-[9px] uppercase tracking-wider mt-1">
+                            <div className="text-(--text-secondary) text-[9px] uppercase tracking-wider mt-1">
                                 STATUS: {systemHealth[hoveredOrgan] === 100 ? 'OPTIMIZED' : 'RESTORING'}
                             </div>
                         </motion.div>

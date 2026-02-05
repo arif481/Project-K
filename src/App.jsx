@@ -26,9 +26,9 @@ export default function App() {
   // Show loading spinner while Auth state initializes
   if (isLoading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-[var(--bg-void)] relative overflow-hidden">
+      <div className="h-screen w-full flex items-center justify-center bg-(--bg-void) relative overflow-hidden">
         {/* Animated background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[var(--bg-void)] via-[var(--bg-panel)] to-[var(--bg-void)]" />
+        <div className="absolute inset-0 bg-linear-to-br from-(--bg-void) via-[var(--bg-panel)] to-(--bg-void)" />
         <div className="absolute inset-0 grid-bg" />
         
         <motion.div 
@@ -44,11 +44,11 @@ export default function App() {
             transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
           >
             <div 
-              className="absolute inset-0 border-2 border-[var(--neon-cyan-hex)] opacity-50"
+              className="absolute inset-0 border-2 border-(--neon-cyan-hex) opacity-50"
               style={{ clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" }}
             />
             <div 
-              className="w-16 h-16 flex items-center justify-center text-[var(--neon-cyan-hex)] text-2xl font-black"
+              className="w-16 h-16 flex items-center justify-center text-(--neon-cyan-hex) text-2xl font-black"
               style={{ 
                 background: 'linear-gradient(135deg, var(--bg-card), var(--bg-void))',
                 clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)"
@@ -60,9 +60,9 @@ export default function App() {
           
           {/* Loading indicator */}
           <div className="flex flex-col items-center gap-3">
-            <div className="w-32 h-1 bg-[var(--bg-muted)] overflow-hidden">
+            <div className="w-32 h-1 bg-(--bg-muted) overflow-hidden">
               <motion.div
-                className="h-full bg-[var(--neon-cyan-hex)]"
+                className="h-full bg-(--neon-cyan-hex)"
                 initial={{ x: '-100%' }}
                 animate={{ x: '100%' }}
                 transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
@@ -70,7 +70,7 @@ export default function App() {
               />
             </div>
             <motion.span 
-              className="hud-label text-[var(--neon-cyan-hex)]"
+              className="hud-label text-(--neon-cyan-hex)"
               animate={{ opacity: [1, 0.5, 1] }}
               transition={{ duration: 1.5, repeat: Infinity }}
             >
@@ -99,10 +99,10 @@ export default function App() {
           transition={{ duration: 0.4 }}
         >
           <div className="dashboard__header mb-6">
-            <h1 className="text-2xl md:text-3xl font-[var(--font-display)] text-white tracking-widest border-l-4 border-[var(--neon-cyan-hex)] pl-4">
+            <h1 className="text-2xl md:text-3xl font-[var(--font-display)] text-white tracking-widest border-l-4 border-(--neon-cyan-hex) pl-4">
               TELEMETRY CONSOLE
             </h1>
-            <p className="hud-label text-[var(--text-secondary)] mt-2 pl-4">
+            <p className="hud-label text-(--text-secondary) mt-2 pl-4">
               DEEP ANALYSIS // RECOVERY METRICS
             </p>
           </div>
@@ -127,10 +127,10 @@ export default function App() {
           transition={{ duration: 0.4 }}
         >
           <div className="dashboard__header mb-6">
-            <h1 className="text-2xl md:text-3xl font-[var(--font-display)] text-gradient tracking-widest border-l-4 border-[var(--neon-cyan-hex)] pl-4">
+            <h1 className="text-2xl md:text-3xl font-[var(--font-display)] text-gradient tracking-widest border-l-4 border-(--neon-cyan-hex) pl-4">
               QUICK LOG
             </h1>
-            <p className="hud-label text-[var(--text-secondary)] mt-2 pl-4">
+            <p className="hud-label text-(--text-secondary) mt-2 pl-4">
               RECORD PROGRESS // TRACK SETBACKS
             </p>
           </div>
@@ -144,7 +144,7 @@ export default function App() {
   };
 
   return (
-    <div className="app bg-[var(--bg-void)] min-h-screen relative">
+    <div className="app bg-(--bg-void) min-h-screen relative">
       {/* Subtle 3D Background for desktop only */}
       {!isMobile && <Scene3DBackgroundLite />}
       
@@ -168,7 +168,7 @@ export default function App() {
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-[var(--bg-card)] border border-[var(--neon-cyan-hex)] text-[var(--neon-cyan-hex)] flex items-center justify-center hover:bg-[var(--neon-cyan-hex)] hover:text-black transition-all duration-300 z-50 group glow-cyan"
+        className="fixed bottom-6 right-6 w-14 h-14 bg-(--bg-card) border border-(--neon-cyan-hex) text-(--neon-cyan-hex) flex items-center justify-center hover:bg-(--neon-cyan-hex) hover:text-black transition-all duration-300 z-50 group glow-cyan"
         style={{ clipPath: 'polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%)' }}
         onClick={() => setShowQuickLog(true)}
       >

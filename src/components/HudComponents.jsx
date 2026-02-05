@@ -39,16 +39,16 @@ export function HudCard({
             className={cn("hud-card", variantClass, className)}
         >
             {title && (
-                <div className="flex items-center justify-between mb-4 border-b border-[var(--border-dim)] pb-3">
-                    <h3 className="hud-label flex items-center gap-2 text-[var(--neon-cyan-hex)]">
+                <div className="flex items-center justify-between mb-4 border-b border-(--border-dim) pb-3">
+                    <h3 className="hud-label flex items-center gap-2 text-(--neon-cyan-hex)">
                         <span className="status-dot active"></span>
                         {title}
                     </h3>
                     {showIndicators && (
                         <div className="flex gap-1.5">
-                            <span className="w-1.5 h-1.5 bg-[var(--neon-cyan-hex)] animate-pulse"></span>
-                            <span className="w-1.5 h-1.5 bg-[var(--neon-cyan-hex)] opacity-50"></span>
-                            <span className="w-1.5 h-1.5 bg-[var(--neon-cyan-hex)] opacity-25"></span>
+                            <span className="w-1.5 h-1.5 bg-(--neon-cyan-hex) animate-pulse"></span>
+                            <span className="w-1.5 h-1.5 bg-(--neon-cyan-hex) opacity-50"></span>
+                            <span className="w-1.5 h-1.5 bg-(--neon-cyan-hex) opacity-25"></span>
                         </div>
                     )}
                 </div>
@@ -137,7 +137,7 @@ export function HudInput({
     return (
         <div className="flex flex-col gap-1.5">
             {label && (
-                <label className="hud-label text-[var(--neon-cyan-hex)]">
+                <label className="hud-label text-(--neon-cyan-hex)">
                     {label}
                 </label>
             )}
@@ -149,13 +149,13 @@ export function HudInput({
                 disabled={disabled}
                 className={cn(
                     "hud-input",
-                    error && "border-[var(--neon-magenta-hex)]",
+                    error && "border-(--neon-magenta-hex)",
                     className
                 )}
                 {...props}
             />
             {error && (
-                <span className="text-[0.65rem] text-[var(--neon-magenta-hex)] font-mono">
+                <span className="text-[0.65rem] text-(--neon-magenta-hex) font-mono">
                     ⚠ {error}
                 </span>
             )}
@@ -178,7 +178,7 @@ export function HudSelect({
     return (
         <div className="flex flex-col gap-1.5">
             {label && (
-                <label className="hud-label text-[var(--neon-cyan-hex)]">
+                <label className="hud-label text-(--neon-cyan-hex)">
                     {label}
                 </label>
             )}
@@ -219,7 +219,7 @@ export function HudProgress({
             <div className="hud-progress-header">
                 <span className="hud-label">{label}</span>
                 {showValue && (
-                    <span className="hud-value text-sm text-[var(--neon-cyan-hex)]">
+                    <span className="hud-value text-sm text-(--neon-cyan-hex)">
                         {percentage.toFixed(0)}%
                     </span>
                 )}
@@ -310,7 +310,7 @@ export function StatusIndicator({
 // ==========================================
 export function HudDivider({ className = "" }) {
     return (
-        <div className={cn("w-full h-px bg-gradient-to-r from-transparent via-[var(--border-dim)] to-transparent my-4", className)} />
+        <div className={cn("w-full h-px bg-linear-to-r from-transparent via-[var(--border-dim)] to-transparent my-4", className)} />
     );
 }
 
@@ -325,8 +325,8 @@ export function DataDisplay({
     className = ""
 }) {
     const trendColors = {
-        up: "text-[var(--neon-green-hex)]",
-        down: "text-[var(--neon-magenta-hex)]"
+        up: "text-(--neon-green-hex)",
+        down: "text-(--neon-magenta-hex)"
     };
     
     const trendIcons = {
@@ -338,8 +338,8 @@ export function DataDisplay({
         <div className={cn("flex flex-col gap-1", className)}>
             <span className="hud-label">{label}</span>
             <div className="flex items-baseline gap-2">
-                <span className="hud-value text-xl text-[var(--text-primary)]">{value}</span>
-                {unit && <span className="text-xs text-[var(--text-secondary)]">{unit}</span>}
+                <span className="hud-value text-xl text-(--text-primary)">{value}</span>
+                {unit && <span className="text-xs text-(--text-secondary)">{unit}</span>}
                 {trend && (
                     <span className={cn("text-sm", trendColors[trend])}>
                         {trendIcons[trend]}
@@ -382,7 +382,7 @@ export function LoadingSpinner({ size = "md", className = "" }) {
     
     return (
         <div className={cn(
-            "rounded-full border-[var(--neon-cyan-hex)] border-t-transparent animate-spin",
+            "rounded-full border-(--neon-cyan-hex) border-t-transparent animate-spin",
             sizeClasses[size],
             className
         )} />
@@ -397,13 +397,13 @@ export function GlitchText({ children, className = "" }) {
         <span className={cn("relative inline-block", className)}>
             <span className="relative z-10">{children}</span>
             <span 
-                className="absolute top-0 left-0 -ml-0.5 text-[var(--neon-cyan-hex)] opacity-70 animate-pulse" 
+                className="absolute top-0 left-0 -ml-0.5 text-(--neon-cyan-hex) opacity-70 animate-pulse" 
                 aria-hidden="true"
             >
                 {children}
             </span>
             <span 
-                className="absolute top-0 left-0 ml-0.5 text-[var(--neon-magenta-hex)] opacity-70 animate-pulse" 
+                className="absolute top-0 left-0 ml-0.5 text-(--neon-magenta-hex) opacity-70 animate-pulse" 
                 style={{ animationDelay: '0.1s' }}
                 aria-hidden="true"
             >

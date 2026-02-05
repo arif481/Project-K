@@ -90,17 +90,17 @@ function BootSequence({ onComplete }) {
                                 <motion.span
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
-                                    className="checkmark text-[var(--neon-green-hex)]"
+                                    className="checkmark text-(--neon-green-hex)"
                                 >
                                     ✓
                                 </motion.span>
-                                <span className={item.final ? "text-[var(--neon-green-hex)]" : ""}>
+                                <span className={item.final ? "text-(--neon-green-hex)" : ""}>
                                     {item.text}
                                 </span>
                             </>
                         ) : currentLine === index ? (
                             <>
-                                <span className="text-[var(--neon-cyan-hex)]">›</span>
+                                <span className="text-(--neon-cyan-hex)">›</span>
                                 <TypingText 
                                     text={item.text} 
                                     onComplete={() => handleLineComplete(index)}
@@ -114,13 +114,13 @@ function BootSequence({ onComplete }) {
             
             {/* Progress bar */}
             <motion.div 
-                className="mt-6 h-1 bg-[var(--bg-muted)] overflow-hidden"
+                className="mt-6 h-1 bg-(--bg-muted) overflow-hidden"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
             >
                 <motion.div
-                    className="h-full bg-[var(--neon-cyan-hex)]"
+                    className="h-full bg-(--neon-cyan-hex)"
                     initial={{ width: 0 }}
                     animate={{ width: `${((currentLine + 1) / BOOT_SEQUENCE.length) * 100}%` }}
                     transition={{ duration: 0.5, ease: "easeOut" }}
@@ -207,7 +207,7 @@ export default function AuthTerminal({ onSuccess }) {
             {isMobile ? <Scene3DBackgroundLite /> : <Scene3DBackground />}
             
             {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--bg-void)]/50 to-[var(--bg-void)] pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-b from-transparent via-[var(--bg-void)]/50 to-(--bg-void) pointer-events-none" />
             
             <div className="w-full max-w-md relative z-10">
                 {/* Logo/Brand */}
@@ -218,7 +218,7 @@ export default function AuthTerminal({ onSuccess }) {
                     className="text-center mb-8"
                 >
                     <h1 className="hero-title text-gradient mb-2">RECOVERY.OS</h1>
-                    <p className="hud-label text-[var(--text-secondary)]">
+                    <p className="hud-label text-(--text-secondary)">
                         OPERATOR AUTHENTICATION REQUIRED
                     </p>
                 </motion.div>
@@ -254,7 +254,7 @@ export default function AuthTerminal({ onSuccess }) {
                                     {/* Header Icon */}
                                     <div className="text-center">
                                         <motion.div 
-                                            className="inline-block p-4 border border-[var(--neon-cyan-hex)] mb-2 glow-cyan"
+                                            className="inline-block p-4 border border-(--neon-cyan-hex) mb-2 glow-cyan"
                                             style={{
                                                 clipPath: "polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)"
                                             }}
@@ -269,7 +269,7 @@ export default function AuthTerminal({ onSuccess }) {
                                         >
                                             <span className="text-3xl">🔐</span>
                                         </motion.div>
-                                        <p className="hud-label text-[var(--text-secondary)] mt-2">
+                                        <p className="hud-label text-(--text-secondary) mt-2">
                                             SECURE REAL-TIME UPLINK
                                         </p>
                                     </div>
@@ -301,7 +301,7 @@ export default function AuthTerminal({ onSuccess }) {
                                                     initial={{ opacity: 0, height: 0 }}
                                                     animate={{ opacity: 1, height: 'auto' }}
                                                     exit={{ opacity: 0, height: 0 }}
-                                                    className="text-[var(--neon-magenta-hex)] text-xs font-mono border border-[var(--neon-magenta-hex)] p-3 bg-[rgba(255,0,60,0.1)]"
+                                                    className="text-(--neon-magenta-hex) text-xs font-mono border border-(--neon-magenta-hex) p-3 bg-[rgba(255,0,60,0.1)]"
                                                 >
                                                     <span className="flex items-center gap-2">
                                                         <span>⚠</span>
@@ -324,9 +324,9 @@ export default function AuthTerminal({ onSuccess }) {
                                     {/* Divider */}
                                     <div className="relative flex items-center justify-center">
                                         <div className="absolute inset-0 flex items-center">
-                                            <div className="w-full border-t border-[var(--border-dim)]" />
+                                            <div className="w-full border-t border-(--border-dim)" />
                                         </div>
-                                        <span className="relative bg-[var(--bg-card)] px-4 hud-label text-[var(--text-dim)]">
+                                        <span className="relative bg-(--bg-card) px-4 hud-label text-(--text-dim)">
                                             OR AUTHENTICATE VIA
                                         </span>
                                     </div>
@@ -357,7 +357,7 @@ export default function AuthTerminal({ onSuccess }) {
                                                 setIsLogin(!isLogin);
                                                 setError(null);
                                             }}
-                                            className="hud-label text-[var(--text-secondary)] hover:text-[var(--neon-cyan-hex)] transition-colors underline underline-offset-4"
+                                            className="hud-label text-(--text-secondary) hover:text-(--neon-cyan-hex) transition-colors underline underline-offset-4"
                                         >
                                             {isLogin ? 'INITIALIZE NEW OPERATOR ID' : 'RETURN TO LOGIN TERMINAL'}
                                         </button>
@@ -370,7 +370,7 @@ export default function AuthTerminal({ onSuccess }) {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: 0.5 }}
-                                className="text-center mt-6 hud-label text-[var(--text-dim)]"
+                                className="text-center mt-6 hud-label text-(--text-dim)"
                             >
                                 RECOVERY.OS V3 — BUILT WITH PRECISION
                             </motion.p>

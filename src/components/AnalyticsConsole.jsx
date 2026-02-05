@@ -32,7 +32,7 @@ const StatCard = ({ label, value, color, icon, trend, delay = 0 }) => (
             
             <div className="relative z-10">
                 <div className="text-2xl mb-2">{icon}</div>
-                <div className="text-[9px] text-[var(--text-dim)] font-mono mb-2 tracking-wider">{label}</div>
+                <div className="text-[9px] text-(--text-dim) font-mono mb-2 tracking-wider">{label}</div>
                 <div className="text-3xl font-mono font-black" style={{ color }}>{value}</div>
                 {trend !== undefined && (
                     <div className={`text-[10px] font-mono mt-1 ${trend >= 0 ? 'text-[#00FF88]' : 'text-[#FF0064]'}`}>
@@ -49,12 +49,12 @@ const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
     
     return (
-        <div className="bg-[rgba(0,0,0,0.9)] border border-[var(--border-dim)] rounded-lg p-3 backdrop-blur-xl">
-            <div className="text-[10px] text-[var(--text-dim)] mb-2 font-mono">{label}</div>
+        <div className="bg-[rgba(0,0,0,0.9)] border border-(--border-dim) rounded-lg p-3 backdrop-blur-xl">
+            <div className="text-[10px] text-(--text-dim) mb-2 font-mono">{label}</div>
             {payload.map((entry, i) => (
                 <div key={i} className="flex items-center gap-2 text-xs font-mono">
                     <div className="w-2 h-2 rounded-full" style={{ background: entry.color }} />
-                    <span className="text-[var(--text-secondary)]">{entry.name}:</span>
+                    <span className="text-(--text-secondary)">{entry.name}:</span>
                     <span style={{ color: entry.color }}>{entry.value}%</span>
                 </div>
             ))}
@@ -67,7 +67,7 @@ const TabButton = ({ active, onClick, children }) => (
     <motion.button
         onClick={onClick}
         className={`relative px-4 py-2 text-xs font-mono transition-all ${
-            active ? 'text-white' : 'text-[var(--text-dim)] hover:text-[var(--text-secondary)]'
+            active ? 'text-white' : 'text-(--text-dim) hover:text-(--text-secondary)'
         }`}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -76,7 +76,7 @@ const TabButton = ({ active, onClick, children }) => (
         {active && (
             <motion.div
                 layoutId="activeTab"
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[var(--neon-cyan)] to-[var(--neon-purple)]"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-linear-to-r from-(--neon-cyan) to-(--neon-purple)"
             />
         )}
     </motion.button>
@@ -241,11 +241,11 @@ export default function AnalyticsConsole() {
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-lg font-mono font-bold text-white mb-1">ANALYTICS CONSOLE</h2>
-                    <p className="text-[10px] text-[var(--text-dim)] font-mono">Real-time telemetry & performance metrics</p>
+                    <p className="text-[10px] text-(--text-dim) font-mono">Real-time telemetry & performance metrics</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-[var(--neon-green)] animate-pulse" />
-                    <span className="text-[10px] font-mono text-[var(--text-dim)]">LIVE DATA</span>
+                    <div className="w-2 h-2 rounded-full bg-(--neon-green) animate-pulse" />
+                    <span className="text-[10px] font-mono text-(--text-dim)">LIVE DATA</span>
                 </div>
             </div>
 
@@ -284,7 +284,7 @@ export default function AnalyticsConsole() {
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex items-center justify-between border-b border-[var(--border-dim)]">
+            <div className="flex items-center justify-between border-b border-(--border-dim)">
                 <div className="flex gap-1">
                     {tabs.map(tab => (
                         <TabButton
@@ -305,8 +305,8 @@ export default function AnalyticsConsole() {
                                 onClick={() => setChartTimeframe(tf)}
                                 className={`px-2 py-1 text-[9px] font-mono rounded transition-all ${
                                     chartTimeframe === tf 
-                                        ? 'bg-[var(--neon-cyan)] text-black' 
-                                        : 'text-[var(--text-dim)] hover:text-white'
+                                        ? 'bg-(--neon-cyan) text-black' 
+                                        : 'text-(--text-dim) hover:text-white'
                                 }`}
                             >
                                 {tf.toUpperCase()}
@@ -379,8 +379,8 @@ export default function AnalyticsConsole() {
                                 ) : (
                                     <div className="h-64 flex flex-col items-center justify-center text-center">
                                         <span className="text-4xl mb-3">📊</span>
-                                        <p className="text-[var(--text-secondary)] font-mono text-sm mb-1">No data available</p>
-                                        <p className="text-[var(--text-dim)] font-mono text-xs">Log entries to see your trends</p>
+                                        <p className="text-(--text-secondary) font-mono text-sm mb-1">No data available</p>
+                                        <p className="text-(--text-dim) font-mono text-xs">Log entries to see your trends</p>
                                     </div>
                                 )}
                             </HudCard>
@@ -410,7 +410,7 @@ export default function AnalyticsConsole() {
                                                         <span className="text-xs font-mono uppercase text-white">{substance}</span>
                                                     </div>
                                                     <div className="flex items-center gap-3">
-                                                        <span className="text-[10px] font-mono text-[var(--text-dim)]">
+                                                        <span className="text-[10px] font-mono text-(--text-dim)">
                                                             {days} days
                                                         </span>
                                                         <span className="text-sm font-mono font-bold" style={{ color }}>
@@ -427,7 +427,7 @@ export default function AnalyticsConsole() {
                                                         transition={{ duration: 1.5, ease: 'easeOut', delay: idx * 0.1 }}
                                                     >
                                                         {/* Shimmer effect */}
-                                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+                                                        <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
                                                     </motion.div>
                                                 </div>
                                             </motion.div>
@@ -436,8 +436,8 @@ export default function AnalyticsConsole() {
                                 </div>
                                 
                                 {/* Mini bar chart */}
-                                <div className="mt-4 pt-4 border-t border-[var(--border-dim)]">
-                                    <div className="text-[9px] font-mono text-[var(--text-dim)] mb-3">COMPARATIVE PROGRESS</div>
+                                <div className="mt-4 pt-4 border-t border-(--border-dim)">
+                                    <div className="text-[9px] font-mono text-(--text-dim) mb-3">COMPARATIVE PROGRESS</div>
                                     <div style={{ width: '100%', height: 100 }}>
                                         <ResponsiveContainer>
                                             <BarChart data={barData} layout="vertical">
@@ -524,7 +524,7 @@ export default function AnalyticsConsole() {
                                     
                                     {/* Stats comparison */}
                                     <div className="space-y-4 py-4">
-                                        <div className="text-[10px] font-mono text-[var(--text-dim)] mb-4">DETAILED METRICS</div>
+                                        <div className="text-[10px] font-mono text-(--text-dim) mb-4">DETAILED METRICS</div>
                                         {['cigarettes', 'cannabis', 'alcohol'].map((substance, idx) => {
                                             const data = progress[substance];
                                             const isActive = !!quitDates[substance];
@@ -539,8 +539,8 @@ export default function AnalyticsConsole() {
                                                     transition={{ delay: idx * 0.1 }}
                                                     className={`p-4 rounded-lg border transition-all ${
                                                         isActive 
-                                                            ? 'bg-[rgba(255,255,255,0.02)] border-[var(--border-dim)]' 
-                                                            : 'bg-transparent border-dashed border-[var(--border-dim)] opacity-40'
+                                                            ? 'bg-[rgba(255,255,255,0.02)] border-(--border-dim)' 
+                                                            : 'bg-transparent border-dashed border-(--border-dim) opacity-40'
                                                     }`}
                                                 >
                                                     <div className="flex items-center gap-3 mb-3">
@@ -556,19 +556,19 @@ export default function AnalyticsConsole() {
                                                     </div>
                                                     <div className="grid grid-cols-3 gap-4 text-center">
                                                         <div>
-                                                            <div className="text-[9px] text-[var(--text-dim)]">STREAK</div>
+                                                            <div className="text-[9px] text-(--text-dim)">STREAK</div>
                                                             <div className="text-lg font-mono font-bold text-white">
                                                                 {data?.streak?.days || 0}
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <div className="text-[9px] text-[var(--text-dim)]">HEALTH</div>
+                                                            <div className="text-[9px] text-(--text-dim)">HEALTH</div>
                                                             <div className="text-lg font-mono font-bold" style={{ color }}>
                                                                 {Math.round(data?.progress || 0)}%
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <div className="text-[9px] text-[var(--text-dim)]">RANK</div>
+                                                            <div className="text-[9px] text-(--text-dim)">RANK</div>
                                                             <div className="text-lg font-mono font-bold text-white">
                                                                 {data?.rank || '-'}
                                                             </div>

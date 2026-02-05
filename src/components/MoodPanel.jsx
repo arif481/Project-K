@@ -36,7 +36,7 @@ export default function MoodPanel({ substance }) {
     if (!substance || Object.keys(moodStatus).length === 0) {
         return (
             <HudCard title="NEURO-PSYCH LINK" className="opacity-50">
-                <div className="text-center py-8 text-[var(--text-secondary)] font-mono text-xs">
+                <div className="text-center py-8 text-(--text-secondary) font-mono text-xs">
                     SELECT AN ACTIVE PROTOCOL TO MONITOR
                 </div>
             </HudCard>
@@ -61,7 +61,7 @@ export default function MoodPanel({ substance }) {
                             className="group"
                         >
                             <div className="flex justify-between items-center mb-1">
-                                <span className="text-[10px] font-mono text-[var(--text-secondary)] flex items-center gap-1">
+                                <span className="text-[10px] font-mono text-(--text-secondary) flex items-center gap-1">
                                     <span>{indicator.icon}</span> {indicator.label}
                                 </span>
                                 <div className="flex items-center gap-2">
@@ -80,7 +80,7 @@ export default function MoodPanel({ substance }) {
                                 </div>
                             </div>
 
-                            <div className="h-2 w-full bg-[var(--bg-grid)] border border-[var(--border-dim)] relative overflow-hidden rounded-sm">
+                            <div className="h-2 w-full bg-(--bg-grid) border border-(--border-dim) relative overflow-hidden rounded-sm">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${isPositive ? 100 - severity : severity}%` }}
@@ -108,8 +108,8 @@ export default function MoodPanel({ substance }) {
                 })}
 
                 {/* Summary */}
-                <div className="mt-2 pt-3 border-t border-[var(--border-dim)]">
-                    <div className="text-[9px] text-[var(--text-secondary)] font-mono">
+                <div className="mt-2 pt-3 border-t border-(--border-dim)">
+                    <div className="text-[9px] text-(--text-secondary) font-mono">
                         Withdrawal symptoms typically peak at 2-3 days and gradually improve over weeks.
                         Monitor these metrics and log any significant changes.
                     </div>

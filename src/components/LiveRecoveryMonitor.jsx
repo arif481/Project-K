@@ -234,19 +234,19 @@ export default function LiveRecoveryMonitor() {
                 
                 <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
                     <motion.div
-                        className="w-16 h-16 rounded-full border-2 border-dashed border-[var(--border-dim)] flex items-center justify-center mb-4"
+                        className="w-16 h-16 rounded-full border-2 border-dashed border-(--border-dim) flex items-center justify-center mb-4"
                         animate={{ rotate: 360 }}
                         transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
                     >
                         <span className="text-2xl opacity-40">📡</span>
                     </motion.div>
-                    <div className="text-[var(--text-secondary)] font-mono">
+                    <div className="text-(--text-secondary) font-mono">
                         <div className="text-sm mb-1">LINK OFFLINE</div>
-                        <div className="text-[10px] text-[var(--text-dim)]">
+                        <div className="text-[10px] text-(--text-dim)">
                             Initialize a protocol to begin<br />real-time data streaming
                         </div>
                     </div>
-                    <div className="mt-4 flex gap-2 text-[9px] font-mono text-[var(--text-dim)]">
+                    <div className="mt-4 flex gap-2 text-[9px] font-mono text-(--text-dim)">
                         <StatusOrb status="offline" />
                         <span>NO SIGNAL</span>
                     </div>
@@ -270,7 +270,7 @@ export default function LiveRecoveryMonitor() {
             />
 
             {/* Background Matrix Rain Effect */}
-            <div className="absolute inset-0 opacity-5 pointer-events-none select-none font-mono text-[9px] leading-tight text-[var(--neon-green)] overflow-hidden p-2">
+            <div className="absolute inset-0 opacity-5 pointer-events-none select-none font-mono text-[9px] leading-tight text-(--neon-green) overflow-hidden p-2">
                 {hexLines.map((line, i) => (
                     <motion.div 
                         key={i}
@@ -287,10 +287,10 @@ export default function LiveRecoveryMonitor() {
             <div ref={containerRef} className="relative z-10 flex flex-col h-full gap-3">
 
                 {/* Status Header */}
-                <div className="flex items-center justify-between py-2 border-b border-[var(--border-dim)]">
+                <div className="flex items-center justify-between py-2 border-b border-(--border-dim)">
                     <div className="flex items-center gap-3">
                         <StatusOrb status="online" size={10} />
-                        <span className="text-[10px] font-mono text-[var(--neon-green)]">STREAM ACTIVE</span>
+                        <span className="text-[10px] font-mono text-(--neon-green)">STREAM ACTIVE</span>
                     </div>
                     <WaveIndicator active={true} color="var(--neon-green)" />
                 </div>
@@ -301,14 +301,14 @@ export default function LiveRecoveryMonitor() {
                         className="bg-[rgba(0,255,136,0.05)] p-3 rounded-lg border border-[rgba(0,255,136,0.1)]"
                         whileHover={{ borderColor: 'rgba(0,255,136,0.3)' }}
                     >
-                        <div className="text-[9px] text-[var(--text-dim)] font-mono mb-1 flex items-center gap-1">
+                        <div className="text-[9px] text-(--text-dim) font-mono mb-1 flex items-center gap-1">
                             <span>⚡</span> ACTIVE PROTOCOLS
                         </div>
                         <div className="flex items-end gap-2">
-                            <div className="text-2xl font-mono font-black text-[var(--neon-green)]">
+                            <div className="text-2xl font-mono font-black text-(--neon-green)">
                                 {activeProtocols}
                             </div>
-                            <div className="text-[10px] text-[var(--text-dim)] mb-1">/3</div>
+                            <div className="text-[10px] text-(--text-dim) mb-1">/3</div>
                         </div>
                     </motion.div>
                     
@@ -316,13 +316,13 @@ export default function LiveRecoveryMonitor() {
                         className="bg-[rgba(0,240,255,0.05)] p-3 rounded-lg border border-[rgba(0,240,255,0.1)]"
                         whileHover={{ borderColor: 'rgba(0,240,255,0.3)' }}
                     >
-                        <div className="text-[9px] text-[var(--text-dim)] font-mono mb-1 flex items-center gap-1">
+                        <div className="text-[9px] text-(--text-dim) font-mono mb-1 flex items-center gap-1">
                             <span>📊</span> STREAM STATUS
                         </div>
                         <div className="flex items-end gap-2">
-                            <div className="text-xl font-mono font-bold text-[var(--neon-cyan)]">LIVE</div>
+                            <div className="text-xl font-mono font-bold text-(--neon-cyan)">LIVE</div>
                             <motion.div 
-                                className="h-4 w-1 bg-[var(--neon-cyan)] mb-1 rounded-full"
+                                className="h-4 w-1 bg-(--neon-cyan) mb-1 rounded-full"
                                 animate={{ opacity: [1, 0.3, 1] }}
                                 transition={{ duration: 1, repeat: Infinity }}
                             />
@@ -331,10 +331,10 @@ export default function LiveRecoveryMonitor() {
                 </div>
 
                 {/* Live Tickers */}
-                <div className="bg-[rgba(0,0,0,0.3)] rounded-lg p-3 border border-[var(--border-dim)]">
+                <div className="bg-[rgba(0,0,0,0.3)] rounded-lg p-3 border border-(--border-dim)">
                     <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                            <span className="text-[10px] text-[var(--text-dim)] font-mono flex items-center gap-1">
+                            <span className="text-[10px] text-(--text-dim) font-mono flex items-center gap-1">
                                 <span>💰</span> CAPITAL_SAVED
                             </span>
                             <AnimatedValue 
@@ -343,9 +343,9 @@ export default function LiveRecoveryMonitor() {
                                 color="#00FF88" 
                             />
                         </div>
-                        <div className="h-px bg-gradient-to-r from-transparent via-[var(--border-dim)] to-transparent" />
+                        <div className="h-px bg-linear-to-r from-transparent via-[var(--border-dim)] to-transparent" />
                         <div className="flex justify-between items-center">
-                            <span className="text-[10px] text-[var(--text-dim)] font-mono flex items-center gap-1">
+                            <span className="text-[10px] text-(--text-dim) font-mono flex items-center gap-1">
                                 <span>⏱️</span> LIFE_REGAINED
                             </span>
                             <AnimatedValue 
@@ -368,15 +368,15 @@ export default function LiveRecoveryMonitor() {
                     >
                         <div className="flex items-center justify-between">
                             <div>
-                                <div className="text-[9px] text-[var(--text-dim)] font-mono mb-1 flex items-center gap-1">
+                                <div className="text-[9px] text-(--text-dim) font-mono mb-1 flex items-center gap-1">
                                     <span>🎯</span> NEXT MILESTONE
                                 </div>
-                                <div className="text-xs font-mono text-[var(--neon-yellow)] truncate max-w-[150px]">
+                                <div className="text-xs font-mono text-(--neon-yellow) truncate max-w-[150px]">
                                     {nextMilestone.label || nextMilestone.name || 'Unknown'}
                                 </div>
                             </div>
                             <div className="text-right">
-                                <div className="text-[9px] text-[var(--text-dim)] mb-1">ETA</div>
+                                <div className="text-[9px] text-(--text-dim) mb-1">ETA</div>
                                 <div className="text-sm font-mono text-white">
                                     {nextMilestone.timeToEventLabel || 'Soon'}
                                 </div>
@@ -387,9 +387,9 @@ export default function LiveRecoveryMonitor() {
 
                 {/* Real Log Output */}
                 <div className="flex-1 flex flex-col overflow-hidden min-h-0">
-                    <div className="text-[9px] text-[var(--text-dim)] mb-2 flex items-center justify-between font-mono">
+                    <div className="text-[9px] text-(--text-dim) mb-2 flex items-center justify-between font-mono">
                         <div className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--neon-cyan)] animate-pulse" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-(--neon-cyan) animate-pulse" />
                             ACTIVITY LOG
                         </div>
                         <span className="text-[8px]">{streamData.length} EVENTS</span>
@@ -437,7 +437,7 @@ export default function LiveRecoveryMonitor() {
                                                         {log.action}
                                                     </div>
                                                 </div>
-                                                <div className="text-[8px] text-[var(--text-dim)] flex-shrink-0">
+                                                <div className="text-[8px] text-(--text-dim) flex-shrink-0">
                                                     {formatTimeAgo(log.timestamp)}
                                                 </div>
                                             </div>
@@ -445,7 +445,7 @@ export default function LiveRecoveryMonitor() {
                                     );
                                 })
                             ) : (
-                                <div className="text-[var(--text-dim)] text-center py-8 text-[10px]">
+                                <div className="text-(--text-dim) text-center py-8 text-[10px]">
                                     <motion.span 
                                         className="text-2xl block mb-2"
                                         animate={{ y: [0, -5, 0] }}
@@ -454,7 +454,7 @@ export default function LiveRecoveryMonitor() {
                                         📋
                                     </motion.span>
                                     No activity logged yet.<br />
-                                    <span className="text-[var(--text-secondary)]">Use check-in buttons to start tracking</span>
+                                    <span className="text-(--text-secondary)">Use check-in buttons to start tracking</span>
                                 </div>
                             )}
                         </AnimatePresence>
@@ -462,10 +462,10 @@ export default function LiveRecoveryMonitor() {
                 </div>
 
                 {/* Footer Status */}
-                <div className="flex items-center justify-between text-[9px] font-mono text-[var(--text-dim)] pt-2 border-t border-[var(--border-dim)]">
+                <div className="flex items-center justify-between text-[9px] font-mono text-(--text-dim) pt-2 border-t border-(--border-dim)">
                     <div className="flex items-center gap-2">
                         <motion.div 
-                            className="w-1.5 h-1.5 rounded-full bg-[var(--neon-green)]"
+                            className="w-1.5 h-1.5 rounded-full bg-(--neon-green)"
                             animate={{ opacity: [1, 0.4, 1] }}
                             transition={{ duration: 2, repeat: Infinity }}
                         />

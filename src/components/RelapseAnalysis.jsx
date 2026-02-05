@@ -148,8 +148,8 @@ export default function RelapseAnalysis() {
             <HudCard title="RELAPSE ANALYSIS" className="col-span-full">
                 <div className="text-center py-12">
                     <div className="text-4xl mb-4">🛡️</div>
-                    <div className="text-[var(--neon-green)] font-mono text-lg mb-2">NO INCIDENTS RECORDED</div>
-                    <div className="text-[var(--text-secondary)] text-xs font-mono">
+                    <div className="text-(--neon-green) font-mono text-lg mb-2">NO INCIDENTS RECORDED</div>
+                    <div className="text-(--text-secondary) text-xs font-mono">
                         Keep going strong! This module will help you identify patterns if setbacks occur.
                     </div>
                 </div>
@@ -175,7 +175,7 @@ export default function RelapseAnalysis() {
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
-                <div className="text-[9px] text-[var(--text-secondary)] font-mono mt-2 text-center">
+                <div className="text-[9px] text-(--text-secondary) font-mono mt-2 text-center">
                     Identify which days you're most vulnerable
                 </div>
             </HudCard>
@@ -206,14 +206,14 @@ export default function RelapseAnalysis() {
                             </PieChart>
                         </ResponsiveContainer>
                     ) : (
-                        <div className="text-[var(--text-secondary)] text-xs">No time data available</div>
+                        <div className="text-(--text-secondary) text-xs">No time data available</div>
                     )}
                 </div>
                 <div className="flex flex-wrap justify-center gap-2 mt-2">
                     {timeOfDayData.map(d => (
                         <div key={d.name} className="flex items-center gap-1 text-[9px] font-mono">
                             <div className="w-2 h-2 rounded-full" style={{ background: d.color }} />
-                            <span className="text-[var(--text-secondary)]">{d.name.split(' ')[0]}</span>
+                            <span className="text-(--text-secondary)">{d.name.split(' ')[0]}</span>
                         </div>
                     ))}
                 </div>
@@ -224,25 +224,25 @@ export default function RelapseAnalysis() {
                 <HudCard title="STREAK METRICS">
                     <div className="grid grid-cols-3 gap-4 text-center py-4">
                         <div>
-                            <div className="text-3xl font-mono font-bold text-[var(--neon-green)]">
+                            <div className="text-3xl font-mono font-bold text-(--neon-green)">
                                 {streakAnalysis.maxStreak}
                             </div>
-                            <div className="text-[9px] text-[var(--text-secondary)] font-mono">BEST STREAK (DAYS)</div>
+                            <div className="text-[9px] text-(--text-secondary) font-mono">BEST STREAK (DAYS)</div>
                         </div>
                         <div>
-                            <div className="text-3xl font-mono font-bold text-[var(--neon-cyan)]">
+                            <div className="text-3xl font-mono font-bold text-(--neon-cyan)">
                                 {streakAnalysis.avgStreak}
                             </div>
-                            <div className="text-[9px] text-[var(--text-secondary)] font-mono">AVG STREAK (DAYS)</div>
+                            <div className="text-[9px] text-(--text-secondary) font-mono">AVG STREAK (DAYS)</div>
                         </div>
                         <div>
-                            <div className="text-3xl font-mono font-bold text-[var(--neon-magenta)]">
+                            <div className="text-3xl font-mono font-bold text-(--neon-magenta)">
                                 {streakAnalysis.total}
                             </div>
-                            <div className="text-[9px] text-[var(--text-secondary)] font-mono">TOTAL INCIDENTS</div>
+                            <div className="text-[9px] text-(--text-secondary) font-mono">TOTAL INCIDENTS</div>
                         </div>
                     </div>
-                    <div className="text-[9px] text-[var(--text-secondary)] font-mono text-center border-t border-[var(--border-dim)] pt-3">
+                    <div className="text-[9px] text-(--text-secondary) font-mono text-center border-t border-(--border-dim) pt-3">
                         Your resilience is growing with each attempt
                     </div>
                 </HudCard>
@@ -260,7 +260,7 @@ export default function RelapseAnalysis() {
                                 transition={{ delay: index * 0.1 }}
                                 className="flex items-center gap-3"
                             >
-                                <div className="w-8 h-8 flex items-center justify-center rounded bg-[var(--bg-grid)] border border-[var(--border-dim)]">
+                                <div className="w-8 h-8 flex items-center justify-center rounded bg-(--bg-grid) border border-(--border-dim)">
                                     {trigger === 'stress' && '😰'}
                                     {trigger === 'social' && '🎉'}
                                     {trigger === 'emotional' && '💔'}
@@ -268,19 +268,19 @@ export default function RelapseAnalysis() {
                                 </div>
                                 <div className="flex-1">
                                     <div className="text-xs font-mono text-white capitalize">{trigger}</div>
-                                    <div className="w-full h-1 bg-[var(--bg-grid)] rounded mt-1">
+                                    <div className="w-full h-1 bg-(--bg-grid) rounded mt-1">
                                         <div
-                                            className="h-full bg-[var(--neon-magenta)] rounded"
+                                            className="h-full bg-(--neon-magenta) rounded"
                                             style={{ width: `${(count / relapseEntries.length) * 100}%` }}
                                         />
                                     </div>
                                 </div>
-                                <div className="text-xs font-mono text-[var(--neon-magenta)]">{count}</div>
+                                <div className="text-xs font-mono text-(--neon-magenta)">{count}</div>
                             </motion.div>
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-6 text-[var(--text-secondary)] text-xs font-mono">
+                    <div className="text-center py-6 text-(--text-secondary) text-xs font-mono">
                         Add notes to your entries to help identify triggers
                     </div>
                 )}

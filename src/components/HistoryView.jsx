@@ -28,7 +28,7 @@ const StatBadge = ({ label, value, color, icon }) => (
     >
         <span className="text-lg">{icon}</span>
         <div>
-            <div className="text-[9px] text-[var(--text-dim)] font-mono">{label}</div>
+            <div className="text-[9px] text-(--text-dim) font-mono">{label}</div>
             <div className="text-sm font-mono font-bold" style={{ color }}>{value}</div>
         </div>
     </motion.div>
@@ -43,7 +43,7 @@ const FilterButton = ({ active, onClick, children, color = 'var(--neon-cyan)' })
         className={`px-3 py-1.5 text-xs font-mono rounded-lg border transition-all ${
             active
                 ? 'text-black font-bold'
-                : 'border-[var(--border-dim)] text-[var(--text-secondary)] hover:border-white hover:text-white'
+                : 'border-(--border-dim) text-(--text-secondary) hover:border-white hover:text-white'
         }`}
         style={active ? { 
             background: color, 
@@ -88,7 +88,7 @@ const EntryCard = ({ entry, onDelete, confirmDelete, setConfirmDelete, index }) 
         >
             <div 
                 className="relative overflow-hidden rounded-xl border transition-all duration-300 bg-[rgba(255,255,255,0.02)]
-                           hover:bg-[rgba(255,255,255,0.04)] border-[var(--border-dim)] hover:border-opacity-50"
+                           hover:bg-[rgba(255,255,255,0.04)] border-(--border-dim) hover:border-opacity-50"
                 style={{ '--hover-color': typeConfig.color }}
             >
                 {/* Colored accent line */}
@@ -133,11 +133,11 @@ const EntryCard = ({ entry, onDelete, confirmDelete, setConfirmDelete, index }) 
                                     </span>
                                 </div>
 
-                                <div className="flex items-center gap-4 text-[10px] text-[var(--text-dim)] font-mono mb-2">
+                                <div className="flex items-center gap-4 text-[10px] text-(--text-dim) font-mono mb-2">
                                     <span className="flex items-center gap-1">
                                         <span>📅</span> {formatEntryDate(entry)}
                                     </span>
-                                    <span className="text-[var(--neon-cyan)] flex items-center gap-1">
+                                    <span className="text-(--neon-cyan) flex items-center gap-1">
                                         <span>⏱</span> {getTimeAgo(entry)}
                                     </span>
                                 </div>
@@ -187,7 +187,7 @@ const EntryCard = ({ entry, onDelete, confirmDelete, setConfirmDelete, index }) 
                             className={`flex-shrink-0 transition-all p-2 rounded-lg ${
                                 confirmDelete === entry.id 
                                     ? 'text-white bg-[#FF0064]' 
-                                    : 'text-[var(--text-dim)] hover:text-[#FF0064] hover:bg-[rgba(255,0,100,0.1)]'
+                                    : 'text-(--text-dim) hover:text-[#FF0064] hover:bg-[rgba(255,0,100,0.1)]'
                             }`}
                             title={confirmDelete === entry.id ? 'Click again to confirm' : 'Purge Record'}
                         >
@@ -264,12 +264,12 @@ export default function HistoryView() {
             >
                 <div>
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="w-1 h-8 bg-gradient-to-b from-[var(--neon-cyan)] to-[var(--neon-purple)] rounded-full" />
+                        <div className="w-1 h-8 bg-linear-to-b from-(--neon-cyan) to-(--neon-purple) rounded-full" />
                         <h1 className="text-2xl font-mono text-white tracking-wider font-bold">
                             MISSION LOGS
                         </h1>
                     </div>
-                    <p className="text-xs text-[var(--text-dim)] font-mono ml-4">
+                    <p className="text-xs text-(--text-dim) font-mono ml-4">
                         Complete archive of your recovery journey
                     </p>
                 </div>
@@ -291,7 +291,7 @@ export default function HistoryView() {
             >
                 {/* Search Bar */}
                 <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-dim)]">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--text-dim)">
                         🔍
                     </div>
                     <input
@@ -300,17 +300,17 @@ export default function HistoryView() {
                         placeholder="Search database..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-[rgba(255,255,255,0.02)] border border-[var(--border-dim)] rounded-xl
+                        className="w-full bg-[rgba(255,255,255,0.02)] border border-(--border-dim) rounded-xl
                                    p-3 pl-12 text-white font-mono text-sm 
-                                   focus:border-[var(--neon-cyan)] focus:bg-[rgba(0,240,255,0.02)]
-                                   outline-none transition-all placeholder:text-[var(--text-dim)]"
+                                   focus:border-(--neon-cyan) focus:bg-[rgba(0,240,255,0.02)]
+                                   outline-none transition-all placeholder:text-(--text-dim)"
                     />
                     {searchTerm && (
                         <motion.button
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             onClick={() => setSearchTerm('')}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-dim)] 
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-(--text-dim) 
                                        hover:text-white transition-colors p-1"
                         >
                             ✕
@@ -322,7 +322,7 @@ export default function HistoryView() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Substance Filter */}
                     <div className="flex gap-2 flex-wrap">
-                        <span className="text-[9px] font-mono text-[var(--text-dim)] w-full mb-1">SUBSTANCE FILTER</span>
+                        <span className="text-[9px] font-mono text-(--text-dim) w-full mb-1">SUBSTANCE FILTER</span>
                         <FilterButton 
                             active={filter === 'all'} 
                             onClick={() => setFilter('all')}
@@ -343,7 +343,7 @@ export default function HistoryView() {
 
                     {/* Type Filter */}
                     <div className="flex gap-2 flex-wrap">
-                        <span className="text-[9px] font-mono text-[var(--text-dim)] w-full mb-1">TYPE FILTER</span>
+                        <span className="text-[9px] font-mono text-(--text-dim) w-full mb-1">TYPE FILTER</span>
                         <FilterButton 
                             active={typeFilter === 'all'} 
                             onClick={() => setTypeFilter('all')}
@@ -366,10 +366,10 @@ export default function HistoryView() {
             </motion.div>
 
             {/* Results Summary */}
-            <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-dim)] py-2 border-y border-[var(--border-dim)]">
+            <div className="flex items-center justify-between text-[10px] font-mono text-(--text-dim) py-2 border-y border-(--border-dim)">
                 <span>Showing {filteredEntries.length} of {entries.length} records</span>
                 <span className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--neon-green)] animate-pulse" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-(--neon-green) animate-pulse" />
                     DATABASE SYNCED
                 </span>
             </div>
@@ -381,8 +381,8 @@ export default function HistoryView() {
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="text-center py-16 border border-dashed border-[var(--border-dim)] rounded-xl 
-                                       text-[var(--text-secondary)] font-mono bg-[rgba(255,255,255,0.01)]"
+                            className="text-center py-16 border border-dashed border-(--border-dim) rounded-xl 
+                                       text-(--text-secondary) font-mono bg-[rgba(255,255,255,0.01)]"
                         >
                             <motion.div 
                                 className="text-5xl mb-4"
@@ -392,7 +392,7 @@ export default function HistoryView() {
                                 📭
                             </motion.div>
                             <div className="text-lg mb-2">NO RECORDS FOUND</div>
-                            <div className="text-xs text-[var(--text-dim)]">
+                            <div className="text-xs text-(--text-dim)">
                                 {searchTerm || filter !== 'all' || typeFilter !== 'all' 
                                     ? 'Try adjusting your filters' 
                                     : 'Start logging your journey to see records here'}
@@ -418,7 +418,7 @@ export default function HistoryView() {
                 <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="text-center py-4 text-[10px] font-mono text-[var(--text-dim)]"
+                    className="text-center py-4 text-[10px] font-mono text-(--text-dim)"
                 >
                     End of archive • {filteredEntries.length} records displayed
                 </motion.div>

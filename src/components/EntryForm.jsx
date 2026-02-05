@@ -52,7 +52,7 @@ const AnimatedSlider = ({ value, onChange, name, color, leftLabel, rightLabel })
                 animate={{ scale: [1, 1.1, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
             />
-            <div className="flex justify-between text-[8px] text-[var(--text-dim)] mt-2">
+            <div className="flex justify-between text-[8px] text-(--text-dim) mt-2">
                 <span>{leftLabel}</span>
                 <span>{rightLabel}</span>
             </div>
@@ -70,7 +70,7 @@ const SelectionCard = ({ active, onClick, icon, label, description, color }) => 
         className={`p-3 rounded-xl border text-left transition-all ${
             active 
                 ? 'bg-opacity-100' 
-                : 'bg-[rgba(255,255,255,0.02)] border-[var(--border-dim)] hover:border-opacity-50'
+                : 'bg-[rgba(255,255,255,0.02)] border-(--border-dim) hover:border-opacity-50'
         }`}
         style={active ? { 
             background: `${color}15`, 
@@ -85,7 +85,7 @@ const SelectionCard = ({ active, onClick, icon, label, description, color }) => 
                     {label}
                 </div>
                 {description && (
-                    <div className="text-[9px] text-[var(--text-dim)]">{description}</div>
+                    <div className="text-[9px] text-(--text-dim)">{description}</div>
                 )}
             </div>
         </div>
@@ -214,7 +214,7 @@ export default function EntryForm({ initialSubstance = 'cigarettes', initialType
                                     {typeInfo?.icon} {typeInfo?.label}
                                 </span>
                             </div>
-                            <p className="text-[10px] text-[var(--text-dim)] font-mono mt-1">{typeInfo?.desc}</p>
+                            <p className="text-[10px] text-(--text-dim) font-mono mt-1">{typeInfo?.desc}</p>
                         </div>
                     </div>
                 </div>
@@ -227,7 +227,7 @@ export default function EntryForm({ initialSubstance = 'cigarettes', initialType
                                 className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold transition-all ${
                                     i + 1 <= step 
                                         ? 'text-black' 
-                                        : 'text-[var(--text-dim)] bg-[rgba(255,255,255,0.05)]'
+                                        : 'text-(--text-dim) bg-[rgba(255,255,255,0.05)]'
                                 }`}
                                 style={i + 1 <= step ? { background: substanceInfo?.color } : {}}
                             >
@@ -254,7 +254,7 @@ export default function EntryForm({ initialSubstance = 'cigarettes', initialType
                         >
                             {/* Substance Selection */}
                             <div>
-                                <label className="text-[10px] text-[var(--text-dim)] font-mono mb-2 block tracking-wider">
+                                <label className="text-[10px] text-(--text-dim) font-mono mb-2 block tracking-wider">
                                     SELECT PROTOCOL
                                 </label>
                                 <div className="grid grid-cols-3 gap-2">
@@ -273,7 +273,7 @@ export default function EntryForm({ initialSubstance = 'cigarettes', initialType
 
                             {/* Type Selection */}
                             <div>
-                                <label className="text-[10px] text-[var(--text-dim)] font-mono mb-2 block tracking-wider">
+                                <label className="text-[10px] text-(--text-dim) font-mono mb-2 block tracking-wider">
                                     ENTRY TYPE
                                 </label>
                                 <div className="grid grid-cols-1 gap-2">
@@ -304,7 +304,7 @@ export default function EntryForm({ initialSubstance = 'cigarettes', initialType
 
                             {/* Timestamp */}
                             <div>
-                                <label className="text-[10px] text-[var(--text-dim)] font-mono mb-2 block tracking-wider">
+                                <label className="text-[10px] text-(--text-dim) font-mono mb-2 block tracking-wider">
                                     TIMESTAMP
                                 </label>
                                 <input
@@ -312,9 +312,9 @@ export default function EntryForm({ initialSubstance = 'cigarettes', initialType
                                     name="date"
                                     value={formData.date}
                                     onChange={handleChange}
-                                    className="w-full bg-[rgba(255,255,255,0.02)] border border-[var(--border-dim)] rounded-lg
+                                    className="w-full bg-[rgba(255,255,255,0.02)] border border-(--border-dim) rounded-lg
                                                text-white p-3 font-mono text-sm 
-                                               focus:border-[var(--neon-cyan)] focus:bg-[rgba(0,240,255,0.02)]
+                                               focus:border-(--neon-cyan) focus:bg-[rgba(0,240,255,0.02)]
                                                outline-none transition-all"
                                 />
                             </div>
@@ -332,7 +332,7 @@ export default function EntryForm({ initialSubstance = 'cigarettes', initialType
                             {/* Amount & Cost */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] text-[var(--text-dim)] font-mono mb-2 block tracking-wider">
+                                    <label className="text-[10px] text-(--text-dim) font-mono mb-2 block tracking-wider">
                                         AMOUNT ({formData.unit})
                                     </label>
                                     <input
@@ -343,13 +343,13 @@ export default function EntryForm({ initialSubstance = 'cigarettes', initialType
                                         step="0.5"
                                         value={formData.amount}
                                         onChange={handleChange}
-                                        className="w-full bg-[rgba(255,255,255,0.02)] border border-[var(--border-dim)] rounded-lg
+                                        className="w-full bg-[rgba(255,255,255,0.02)] border border-(--border-dim) rounded-lg
                                                    text-white p-3 font-mono text-sm 
-                                                   focus:border-[var(--neon-cyan)] outline-none transition-all"
+                                                   focus:border-(--neon-cyan) outline-none transition-all"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] text-[var(--text-dim)] font-mono mb-2 block tracking-wider">
+                                    <label className="text-[10px] text-(--text-dim) font-mono mb-2 block tracking-wider">
                                         COST (₹)
                                     </label>
                                     <input
@@ -359,9 +359,9 @@ export default function EntryForm({ initialSubstance = 'cigarettes', initialType
                                         min="0"
                                         value={formData.cost}
                                         onChange={handleChange}
-                                        className="w-full bg-[rgba(255,255,255,0.02)] border border-[var(--border-dim)] rounded-lg
+                                        className="w-full bg-[rgba(255,255,255,0.02)] border border-(--border-dim) rounded-lg
                                                    text-white p-3 font-mono text-sm 
-                                                   focus:border-[var(--neon-cyan)] outline-none transition-all"
+                                                   focus:border-(--neon-cyan) outline-none transition-all"
                                     />
                                 </div>
                             </div>
@@ -369,7 +369,7 @@ export default function EntryForm({ initialSubstance = 'cigarettes', initialType
                             {/* Mood Slider */}
                             <div>
                                 <div className="flex justify-between mb-3">
-                                    <label className="text-[10px] text-[var(--text-dim)] font-mono tracking-wider">
+                                    <label className="text-[10px] text-(--text-dim) font-mono tracking-wider">
                                         😊 MOOD STATUS
                                     </label>
                                     <span 
@@ -395,7 +395,7 @@ export default function EntryForm({ initialSubstance = 'cigarettes', initialType
                             {/* Craving Slider */}
                             <div>
                                 <div className="flex justify-between mb-3">
-                                    <label className="text-[10px] text-[var(--text-dim)] font-mono tracking-wider">
+                                    <label className="text-[10px] text-(--text-dim) font-mono tracking-wider">
                                         🔥 CRAVING INTENSITY
                                     </label>
                                     <span 
@@ -430,7 +430,7 @@ export default function EntryForm({ initialSubstance = 'cigarettes', initialType
                         >
                             {/* Notes */}
                             <div>
-                                <label className="text-[10px] text-[var(--text-dim)] font-mono mb-2 block tracking-wider">
+                                <label className="text-[10px] text-(--text-dim) font-mono mb-2 block tracking-wider">
                                     📝 MISSION NOTES
                                 </label>
                                 <textarea
@@ -438,33 +438,33 @@ export default function EntryForm({ initialSubstance = 'cigarettes', initialType
                                     value={formData.notes}
                                     onChange={handleChange}
                                     rows="4"
-                                    className="w-full bg-[rgba(255,255,255,0.02)] border border-[var(--border-dim)] rounded-lg
+                                    className="w-full bg-[rgba(255,255,255,0.02)] border border-(--border-dim) rounded-lg
                                                text-white p-3 font-mono text-sm 
-                                               focus:border-[var(--neon-cyan)] outline-none resize-none transition-all"
+                                               focus:border-(--neon-cyan) outline-none resize-none transition-all"
                                     placeholder="Document your observations, triggers, or victories..."
                                 />
                             </div>
 
                             {/* Summary */}
-                            <div className="p-4 rounded-xl bg-[rgba(255,255,255,0.02)] border border-[var(--border-dim)]">
-                                <div className="text-[10px] text-[var(--text-dim)] font-mono mb-3">ENTRY SUMMARY</div>
+                            <div className="p-4 rounded-xl bg-[rgba(255,255,255,0.02)] border border-(--border-dim)">
+                                <div className="text-[10px] text-(--text-dim) font-mono mb-3">ENTRY SUMMARY</div>
                                 <div className="grid grid-cols-2 gap-3 text-xs font-mono">
                                     <div>
-                                        <span className="text-[var(--text-dim)]">Protocol:</span>
+                                        <span className="text-(--text-dim)">Protocol:</span>
                                         <span className="ml-2 text-white">{substanceInfo?.label}</span>
                                     </div>
                                     <div>
-                                        <span className="text-[var(--text-dim)]">Type:</span>
+                                        <span className="text-(--text-dim)">Type:</span>
                                         <span className="ml-2" style={{ color: typeInfo?.color }}>{typeInfo?.label}</span>
                                     </div>
                                     {formData.type !== 'quit' && (
                                         <>
                                             <div>
-                                                <span className="text-[var(--text-dim)]">Mood:</span>
+                                                <span className="text-(--text-dim)">Mood:</span>
                                                 <span className="ml-2 text-[#00F0FF]">{formData.feeling}%</span>
                                             </div>
                                             <div>
-                                                <span className="text-[var(--text-dim)]">Craving:</span>
+                                                <span className="text-(--text-dim)">Craving:</span>
                                                 <span className="ml-2 text-[#FF0064]">{formData.craving}%</span>
                                             </div>
                                         </>
@@ -501,8 +501,8 @@ export default function EntryForm({ initialSubstance = 'cigarettes', initialType
                             onClick={() => setStep(s => s - 1)}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className="py-3 rounded-lg font-mono text-sm border border-[var(--border-dim)] 
-                                       text-[var(--text-secondary)] hover:text-white hover:border-white transition-all"
+                            className="py-3 rounded-lg font-mono text-sm border border-(--border-dim) 
+                                       text-(--text-secondary) hover:text-white hover:border-white transition-all"
                         >
                             ← BACK
                         </motion.button>
