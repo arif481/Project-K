@@ -263,23 +263,36 @@ export default function SubstanceDashboard({ substance, onLogEntry, onInitialize
     const days = substanceProgress?.streak?.days || 0;
 
     // Live ticking effect for money and life
+    // Protected against NaN values
     useEffect(() => {
-        if (!isActive || !quitDates[substance]) return;
+        if (!isActive || !quitDates[substance]) {
+            setTickingMoney(0);
+            setTickingLife(0);
+            return;
+        }
 
         const updateTickers = () => {
             const quitDate = new Date(quitDates[substance]);
             const now = new Date();
             const msElapsed = now - quitDate;
+            
+            // Ensure valid elapsed time
+            if (isNaN(msElapsed) || msElapsed < 0) {
+                setTickingMoney(0);
+                setTickingLife(0);
+                return;
+            }
+            
             const daysElapsed = msElapsed / (1000 * 60 * 60 * 24);
 
-            // Money saved (cost per day * days)
+            // Money saved (cost per day * days) - with NaN protection
             const moneySaved = daysElapsed * costPerDay;
-            setTickingMoney(moneySaved);
+            setTickingMoney(isNaN(moneySaved) ? 0 : moneySaved);
 
-            // Life regained (units not consumed * minutes per unit)
-            const unitsNotConsumed = daysElapsed * config.usagePerDay;
-            const minutesRegained = unitsNotConsumed * config.lifeMinutesPerUnit;
-            setTickingLife(minutesRegained);
+            // Life regained (units not consumed * minutes per unit) - with NaN protection
+            const unitsNotConsumed = daysElapsed * (config?.usagePerDay || 0);
+            const minutesRegained = unitsNotConsumed * (config?.lifeMinutesPerUnit || 0);
+            setTickingLife(isNaN(minutesRegained) ? 0 : minutesRegained);
         };
 
         updateTickers();

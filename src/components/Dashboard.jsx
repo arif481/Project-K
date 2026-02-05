@@ -165,7 +165,7 @@ export default function Dashboard() {
                 />
                 <StatCard 
                     label="Capital Reserves" 
-                    value={advancedStats.moneySavedFormatted} 
+                    value={advancedStats.moneySavedFormatted || '₹0.00'} 
                     subValue="SAVED"
                     color="var(--neon-green-hex)" 
                     icon="💰"
@@ -175,7 +175,7 @@ export default function Dashboard() {
                 <StatCard 
                     label="Chrono Gains" 
                     value={advancedStats.lifeRegainedFormatted?.split(' ')[0] || '0'} 
-                    subValue={advancedStats.lifeRegainedFormatted?.split(' ')[1] || 'HRS'}
+                    subValue={advancedStats.lifeRegainedFormatted?.split(' ')[1] || 'MINS'}
                     color="var(--neon-purple-hex)" 
                     icon="⏱️"
                     delay={0.2}

@@ -79,15 +79,22 @@ export function RecoveryProvider({ children }) {
         };
     }, [user]);
 
-    // Update Settings Handler
+    // Update Settings Handler - with immediate recalculation trigger
     const updateUserSettings = useCallback(async (newSettings) => {
         if (!user) return;
         try {
+            // Optimistic update FIRST for instant UI feedback
+            setUserSettings(prev => {
+                const updated = { ...prev, ...newSettings };
+                // Trigger immediate recalculation
+                setTimeout(() => updateProgress(), 0);
+                return updated;
+            });
+            
+            // Then sync to Firebase
             await setDoc(doc(db, 'users', user.uid), {
                 settings: newSettings
             }, { merge: true });
-            // Optimistic update
-            setUserSettings(prev => ({ ...prev, ...newSettings }));
         } catch {
             // Settings sync failed - optimistic update already applied
         }

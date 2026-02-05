@@ -120,27 +120,41 @@ export default function LiveRecoveryMonitor() {
     }, [isOnline]);
 
     // Sync with global stats and add micro-interpolation for smooth ticking
+    // Protected against NaN values
     useEffect(() => {
-        if (!isOnline) return;
+        if (!isOnline) {
+            setDisplayMoney(0);
+            setDisplayLife(0);
+            return;
+        }
 
-        setDisplayMoney(advancedStats.moneySaved);
-        setDisplayLife(advancedStats.lifeRegainedMinutes);
+        // Ensure we have valid numbers, default to 0 if NaN
+        const moneySaved = advancedStats?.moneySaved;
+        const lifeMins = advancedStats?.lifeRegainedMinutes;
+        setDisplayMoney(isNaN(moneySaved) || moneySaved === null ? 0 : moneySaved);
+        setDisplayLife(isNaN(lifeMins) || lifeMins === null ? 0 : lifeMins);
 
         // Calculate per-second gains based on active protocols
-        const cigRate = quitDates.cigarettes ? (userSettings?.costs?.cigarettes || 350) : 0;
-        const alcRate = quitDates.alcohol ? (userSettings?.costs?.alcohol || 400) : 0;
-        const canRate = quitDates.cannabis ? (userSettings?.costs?.cannabis || 500) : 0;
+        const cigRate = quitDates?.cigarettes ? (userSettings?.costs?.cigarettes || 350) : 0;
+        const alcRate = quitDates?.alcohol ? (userSettings?.costs?.alcohol || 400) : 0;
+        const canRate = quitDates?.cannabis ? (userSettings?.costs?.cannabis || 500) : 0;
 
         const totalDailySave = cigRate + alcRate + canRate;
         const savePerSec = totalDailySave / 86400;
 
-        const lifePerSec = (quitDates.cigarettes ? (11 * 20) / 86400 : 0) +
-            (quitDates.cannabis ? (5 * 3) / 86400 : 0) +
-            (quitDates.alcohol ? (15 * 4) / 86400 : 0);
+        const lifePerSec = (quitDates?.cigarettes ? (11 * 20) / 86400 : 0) +
+            (quitDates?.cannabis ? (5 * 3) / 86400 : 0) +
+            (quitDates?.alcohol ? (15 * 4) / 86400 : 0);
 
         const interval = setInterval(() => {
-            setDisplayMoney(prev => prev + (savePerSec / 10));
-            setDisplayLife(prev => prev + (lifePerSec / 10));
+            setDisplayMoney(prev => {
+                const next = prev + (savePerSec / 10);
+                return isNaN(next) ? prev : next;
+            });
+            setDisplayLife(prev => {
+                const next = prev + (lifePerSec / 10);
+                return isNaN(next) ? prev : next;
+            });
         }, 100);
 
         return () => clearInterval(interval);

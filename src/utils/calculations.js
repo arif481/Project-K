@@ -375,37 +375,51 @@ export function getCombinedTimeline(quitDates, entries = [], maxItems = 10) {
 
 /**
  * Calculate Advanced Analytics (Financial & Health)
+ * Protected against NaN with proper default values
  */
-export function getAdvancedAnalytics(quitDates, entries = [], userCosts = null) {
+export function getAdvancedAnalytics(quitDates = {}, entries = [], userCosts = null) {
     const substances = ['cigarettes', 'cannabis', 'alcohol'];
     let totalMoneySaved = 0;
     let totalLifeMinutesRegained = 0;
     let totalHeartbeatsSaved = 0;
 
     for (const substance of substances) {
-        if (quitDates[substance]) {
+        if (quitDates && quitDates[substance]) {
             const config = ANALYTICS_CONFIG[substance];
-            // Use custom cost if provided, otherwise default
-            const costPerDay = (userCosts && userCosts[substance]) ? Number(userCosts[substance]) : config.costPerDay;
+            if (!config) continue;
+            
+            // Use custom cost if provided, otherwise default - ensure valid number
+            const rawCost = (userCosts && userCosts[substance]) ? Number(userCosts[substance]) : config.costPerDay;
+            const costPerDay = isNaN(rawCost) || rawCost < 0 ? 0 : rawCost;
 
-            const { elapsedTime } = calculateRecoveryProgress(quitDates[substance], substance, entries);
-            const totalDays = elapsedTime / (1000 * 60 * 60 * 24);
+            const progressData = calculateRecoveryProgress(quitDates[substance], substance, entries);
+            const elapsedTime = progressData?.elapsedTime || 0;
+            const totalDays = Math.max(0, elapsedTime / (1000 * 60 * 60 * 24));
 
-            // Financial
-            totalMoneySaved += totalDays * costPerDay;
+            // Financial - ensure no NaN
+            const saved = totalDays * costPerDay;
+            totalMoneySaved += isNaN(saved) ? 0 : saved;
 
-            // Health
-            const unitsNotConsumed = totalDays * config.usagePerDay;
-            totalLifeMinutesRegained += unitsNotConsumed * config.lifeMinutesPerUnit;
-            totalHeartbeatsSaved += unitsNotConsumed * config.heartbeatsPerUnit;
+            // Health - ensure no NaN
+            const unitsNotConsumed = totalDays * (config.usagePerDay || 0);
+            const lifeMinutes = unitsNotConsumed * (config.lifeMinutesPerUnit || 0);
+            const heartbeats = unitsNotConsumed * (config.heartbeatsPerUnit || 0);
+            
+            totalLifeMinutesRegained += isNaN(lifeMinutes) ? 0 : lifeMinutes;
+            totalHeartbeatsSaved += isNaN(heartbeats) ? 0 : heartbeats;
         }
     }
+
+    // Final NaN protection
+    totalMoneySaved = isNaN(totalMoneySaved) ? 0 : totalMoneySaved;
+    totalLifeMinutesRegained = isNaN(totalLifeMinutesRegained) ? 0 : totalLifeMinutesRegained;
+    totalHeartbeatsSaved = isNaN(totalHeartbeatsSaved) ? 0 : totalHeartbeatsSaved;
 
     return {
         moneySaved: totalMoneySaved,
         lifeRegainedMinutes: totalLifeMinutesRegained,
         heartbeatsSaved: totalHeartbeatsSaved,
         moneySavedFormatted: new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(totalMoneySaved),
-        lifeRegainedFormatted: formatDuration(totalLifeMinutesRegained * 60 * 1000)
+        lifeRegainedFormatted: formatDuration(totalLifeMinutesRegained * 60 * 1000) || '0 mins'
     };
 }
